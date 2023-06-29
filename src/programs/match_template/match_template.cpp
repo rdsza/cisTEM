@@ -211,7 +211,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
 #endif
-    s2_file = my_input->GetFilenameFromUser("S2 orientations file","Must be provided for this version","orientations.txt", false);
+    s2_file = my_input->GetFilenameFromUser("S2 orientations file","Columns containing user define Euler angles","orientations.txt", false);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -445,7 +445,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     AnglesAndShifts angles;
 
     // S2 text file
-    NumericTextFile s2_binning;
+    NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 7);
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
@@ -660,7 +660,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     global_euler_search.CalculateGridSearchPositions(false);
 
     // Append the 2D float array global_euler_search.number _of_search_positions
-    s2_binning.Open(s2_file, )
+    s2_binning.Open();
+    s2_binning.Close();
 
     // for now, I am assuming the MTF has been applied already.
     // work out the filter to just whiten the image..
