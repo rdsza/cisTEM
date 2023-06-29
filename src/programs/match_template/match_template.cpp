@@ -167,6 +167,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     bool     ctf_refinement            = false;
     float    particle_radius_angstroms = 0.0f;
     wxString my_symmetry               = "C1";
+    wxString s2_file ;
     float    in_plane_angular_step     = 0;
     bool     use_gpu_input             = false;
     int      max_threads               = 1; // Only used for the GPU code
@@ -210,6 +211,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
 #endif
+    s2_file = my_input->GetFilenameFromUser("S2 orientations file","Must be provided for this version","orientations.txt", false);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -263,7 +265,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads);
+                                      max_threads,s2_file.ToUTF8( ).data( ));
 }
 
 // override the do calculation method which will be what is actually run..
@@ -373,6 +375,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     float    min_peak_radius                 = my_current_job.arguments[39].ReturnFloatArgument( );
     bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
+    wxString s2_file                         = my_current_job.arguments[42].ReturnStringArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -440,6 +443,9 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     EulerSearch     global_euler_search;
     AnglesAndShifts angles;
+
+    // S2 text file
+    NumericTextFile s2_binning;
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
@@ -652,6 +658,9 @@ bool MatchTemplateApp::DoCalculation( ) {
     }
 
     global_euler_search.CalculateGridSearchPositions(false);
+
+    // Append the 2D float array global_euler_search.number _of_search_positions
+    s2_binning.Open(s2_file, )
 
     // for now, I am assuming the MTF has been applied already.
     // work out the filter to just whiten the image..
