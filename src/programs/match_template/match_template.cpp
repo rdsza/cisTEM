@@ -673,7 +673,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     theta_file = orientations[1];
     phi_file = orientations[2];
     //end loop
-    wxPrintf("Orientations read from file: %12.6f, %12.6f, %12.6f \n", current_psi, current_theta, current_phi);
+    wxPrintf("Orientations read from file: %12.6f, %12.6f, %12.6f \n", psi_file, theta_file, phi_file);
     s2_binning.Close();
 
     // for now, I am assuming the MTF has been applied already.
