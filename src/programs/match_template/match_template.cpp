@@ -436,6 +436,8 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     int i;
 
+    int number_of_search_positions = 0;
+
     long   original_input_image_x;
     long   original_input_image_y;
     int    remove_npix_from_edge = 0;
@@ -445,6 +447,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     AnglesAndShifts angles;
 
     // S2 text file
+    float orientations[3];
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 7);
 
     ImageFile input_search_image_file;
@@ -626,21 +629,21 @@ bool MatchTemplateApp::DoCalculation( ) {
     else
         mask_radius_search = particle_radius_angstroms;
 
-    if ( angular_step <= 0 ) {
-        angular_step = CalculateAngularStep(high_resolution_limit_search, mask_radius_search);
-    }
+    //if ( angular_step <= 0 ) {
+    //    angular_step = CalculateAngularStep(high_resolution_limit_search, mask_radius_search);
+    //}
 
-    if ( in_plane_angular_step <= 0 ) {
-        psi_step = rad_2_deg(pixel_size / mask_radius_search);
-        psi_step = 360.0 / int(360.0 / psi_step + 0.5);
-    }
-    else {
-        psi_step = in_plane_angular_step;
-    }
+    //if ( in_plane_angular_step <= 0 ) {
+    //    psi_step = rad_2_deg(pixel_size / mask_radius_search);
+    //    psi_step = 360.0 / int(360.0 / psi_step + 0.5);
+    //}
+    //else {
+    //    psi_step = in_plane_angular_step;
+    //}
 
     //psi_start = psi_step / 2.0 * global_random_number_generator.GetUniformRandom();
-    psi_start = 0.0f;
-    psi_max   = 360.0f;
+    //psi_start = 0.0f;
+    //psi_max   = 360.0f;
 
     //psi_step = 5;
 
@@ -648,19 +651,26 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     // search grid
 
-    global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
-    if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
-    {
-        if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
-        {
-            global_euler_search.theta_max = 180.0f;
-        }
-    }
+    //global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
+    //if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
+    //{
+    //    if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
+    //    {
+    //        global_euler_search.theta_max = 180.0f;
+    //    }
+    //}
 
     global_euler_search.CalculateGridSearchPositions(false);
 
     // Append the 2D float array global_euler_search.number _of_search_positions
-    s2_binning.Open();
+    //s2_binning.Open( );
+    // for loop here
+    s2_binning.ReadLine(orientations);
+    current_psi = orientations[0];
+    current_theta = orientations[1];
+    current_phi = orientations[2];
+    //end loop
+    wxPrintf("Orientations read from file: %12.6f, %12.6f, %12.6f \n", current_psi, current_theta, current_phi);
     s2_binning.Close();
 
     // for now, I am assuming the MTF has been applied already.
