@@ -440,7 +440,7 @@ fi
 # It's importnat that -static-intel be specified after -mkl, otherwise mkl will be linked dynamically
 if test "x$static_link" = "xtrue"; then
  if test "x$CXX" = "xicpc"; then
- 	LDFLAGS="$LDFLAGS -static-intel -qopenmp-link=static"
+ 	LDFLAGS="$LDFLAGS -static-intel -qopenmp-link=static -static-libgcc -static-libstdc++"
  	# There is no static library for libcilkrts. Suppress this warning.
  	LDFLAGS="$LDFLAGS -wd10237"
  else
