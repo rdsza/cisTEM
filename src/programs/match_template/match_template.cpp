@@ -448,6 +448,9 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     // S2 text file
     float orientations[3];
+    float psi_file;
+    float theta_file;
+    float phi_file;
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 7);
 
     ImageFile input_search_image_file;
@@ -641,13 +644,13 @@ bool MatchTemplateApp::DoCalculation( ) {
     //    psi_step = in_plane_angular_step;
     //}
 
-    //psi_start = psi_step / 2.0 * global_random_number_generator.GetUniformRandom();
-    //psi_start = 0.0f;
-    //psi_max   = 360.0f;
+    psi_start = psi_step / 2.0 * global_random_number_generator.GetUniformRandom();
+    psi_start = 0.0f;
+    psi_max   = 360.0f;
 
-    //psi_step = 5;
+    psi_step = 5;
 
-    //wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
+    wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
 
     // search grid
 
@@ -666,9 +669,9 @@ bool MatchTemplateApp::DoCalculation( ) {
     //s2_binning.Open( );
     // for loop here
     s2_binning.ReadLine(orientations);
-    current_psi = orientations[0];
-    current_theta = orientations[1];
-    current_phi = orientations[2];
+    psi_file = orientations[0];
+    theta_file = orientations[1];
+    phi_file = orientations[2];
     //end loop
     wxPrintf("Orientations read from file: %12.6f, %12.6f, %12.6f \n", current_psi, current_theta, current_phi);
     s2_binning.Close();
