@@ -451,6 +451,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     float psi_file;
     float theta_file;
     float phi_file;
+    float num_lines_txt;
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 7);
 
     ImageFile input_search_image_file;
@@ -654,26 +655,29 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     // search grid
 
-    //global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
-    //if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
-    //{
-    //    if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
-    //    {
-    //        global_euler_search.theta_max = 180.0f;
-    //    }
-    //}
+    global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
+    if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
+    {
+        if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
+        {
+            global_euler_search.theta_max = 180.0f;
+        }
+    }
 
     global_euler_search.CalculateGridSearchPositions(false);
 
     // Append the 2D float array global_euler_search.number _of_search_positions
     //s2_binning.Open( );
     // for loop here
-    s2_binning.ReadLine(orientations);
-    psi_file = orientations[0];
-    theta_file = orientations[1];
-    phi_file = orientations[2];
-    //end loop
-    wxPrintf("Orientations read from file: %12.6f, %12.6f, %12.6f \n", psi_file, theta_file, phi_file);
+    for (int counter = 0; counter < num_lines_txt; counter ++){
+        s2_binning.ReadLine(orientations);
+        psi_file = orientations[0];
+        theta_file = orientations[1];
+        phi_file = orientations[2];
+        //end loop
+        wxPrintf("Orientations read from file: %12.6f, %12.6f, %12.6f \n", psi_file, theta_file, phi_file);
+    }
+    // s2_binning.ReadLine(orientations);
     s2_binning.Close();
 
     // for now, I am assuming the MTF has been applied already.
