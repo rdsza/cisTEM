@@ -666,12 +666,14 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     global_euler_search.CalculateGridSearchPositions(false);
 
-    // 
-    for (int i = 0; i < number_of_search_positions; i++)
+    // to print all global_euler_search.number_of_search_positions; using 10 for debug
+    for (int i = 0; i < 10; i++)
     {
         /* code */
-        wxPrintf("The list of search parameters, Phi : %12.6f \n",list_of_search_parameters[i][0])
-        wxPrintf("The list of search parameters, Phi : %12.6f \n",list_of_search_parameters[i][1])
+        wxPrintf("The list of search parameters, Phi : %12.6f \n",
+    global_euler_search.list_of_search_parameters[i][0])
+        wxPrintf("The list of search parameters, Phi : %12.6f \n",
+    global_euler_search.list_of_search_parameters[i][1])
     }
     
 
