@@ -666,12 +666,11 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     global_euler_search.CalculateGridSearchPositions(false);
 
-    // to print all global_euler_search.number_of_search_positions; using 10 for debug
+    /* to print all global_euler_search.number_of_search_positions; using 10 for debug
     for (int i = 0; i < 10; i++)
     {
-        /* code */
         wxPrintf("The list of search parameters, Phi : %12.6f \n", global_euler_search.list_of_search_parameters[i][0]);
-        wxPrintf("The list of search parameters, Phi : %12.6f \n", global_euler_search.list_of_search_parameters[i][1]);
+        wxPrintf("The list of search parameters, Theta : %12.6f \n", global_euler_search.list_of_search_parameters[i][1]);
     }
     
 
@@ -688,6 +687,21 @@ bool MatchTemplateApp::DoCalculation( ) {
     }
     // s2_binning.ReadLine(orientations);
     s2_binning.Close();
+    
+    
+    ....Above commented [parts work */
+
+    s2_binning.Open(s2_file, OPEN_TO_READ, 0);
+    for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
+        s2_binning.ReadLine(orientations);
+        global_euler_search.list_of_search_parameters[counter][0]=orientations[0];
+        global_euler_search.list_of_search_parameters[counter][1]=orientations[1];
+    }
+    for (int i = 0; i < s2_binning.number_of_lines; i++)
+    {
+        wxPrintf("The list of search parameters, Phi : %12.6f \n", global_euler_search.list_of_search_parameters[i][0]);
+        wxPrintf("The list of search parameters, Theta : %12.6f \n", global_euler_search.list_of_search_parameters[i][1]);
+    }
 
     // for now, I am assuming the MTF has been applied already.
     // work out the filter to just whiten the image..
