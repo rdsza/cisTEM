@@ -452,7 +452,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     float theta_file;
     float phi_file;
     float num_lines_txt;
-    NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 7);
+    NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
