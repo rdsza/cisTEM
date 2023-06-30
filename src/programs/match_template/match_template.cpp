@@ -697,6 +697,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         global_euler_search.list_of_search_parameters[counter][0]=orientations[0];
         global_euler_search.list_of_search_parameters[counter][1]=orientations[1];
     }
+    s2_binning.Close();
     for (int i = 0; i < s2_binning.number_of_lines; i++)
     {
         wxPrintf("The list of search parameters, Phi : %12.6f \n", global_euler_search.list_of_search_parameters[i][0]);
