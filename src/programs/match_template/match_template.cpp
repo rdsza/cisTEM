@@ -666,6 +666,15 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     global_euler_search.CalculateGridSearchPositions(false);
 
+    // 
+    for (int i = 0; i < number_of_search_positions; i++)
+    {
+        /* code */
+        wxPrintf("The list of search parameters, Phi : %12.6f \n",list_of_search_parameters[i][0])
+        wxPrintf("The list of search parameters, Phi : %12.6f \n",list_of_search_parameters[i][1])
+    }
+    
+
     // Append the 2D float array global_euler_search.number _of_search_positions
     //s2_binning.Open(s2_file, OPEN_TO_READ, 0);
     // for loop here
