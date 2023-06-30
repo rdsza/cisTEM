@@ -224,7 +224,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 
     delete my_input;
 
-    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbi", input_search_images.ToUTF8( ).data( ),
+    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbit", input_search_images.ToUTF8( ).data( ),
                                       input_reconstruction.ToUTF8( ).data( ),
                                       pixel_size,
                                       voltage_kV,
@@ -447,7 +447,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     AnglesAndShifts angles;
 
     // S2 text file
-    float orientations[3];
+    float orientations[30];
     float psi_file;
     float theta_file;
     float phi_file;
@@ -669,7 +669,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     // Append the 2D float array global_euler_search.number _of_search_positions
     s2_binning.Open(s2_file, OPEN_TO_READ, 0);
     // for loop here
-    for (int counter = 0; counter < num_lines_txt; counter ++){
+    for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
         s2_binning.ReadLine(orientations);
         psi_file = orientations[0];
         theta_file = orientations[1];
