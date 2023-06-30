@@ -452,7 +452,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     float theta_file;
     float phi_file;
     float num_lines_txt = 5;
-    NumericTextFile s2_binning;
+    NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
@@ -667,7 +667,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     global_euler_search.CalculateGridSearchPositions(false);
 
     // Append the 2D float array global_euler_search.number _of_search_positions
-    s2_binning.Open(s2_file, OPEN_TO_READ, 0);
+    //s2_binning.Open(s2_file, OPEN_TO_READ, 0);
     // for loop here
     for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
         s2_binning.ReadLine(orientations);
