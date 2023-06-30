@@ -451,8 +451,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     float psi_file;
     float theta_file;
     float phi_file;
-    float num_lines_txt;
-    NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
+    float num_lines_txt = 5;
+    NumericTextFile s2_binning;
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
@@ -633,17 +633,17 @@ bool MatchTemplateApp::DoCalculation( ) {
     else
         mask_radius_search = particle_radius_angstroms;
 
-    //if ( angular_step <= 0 ) {
-    //    angular_step = CalculateAngularStep(high_resolution_limit_search, mask_radius_search);
-    //}
+    if ( angular_step <= 0 ) {
+        angular_step = CalculateAngularStep(high_resolution_limit_search, mask_radius_search);
+    }
 
-    //if ( in_plane_angular_step <= 0 ) {
-    //    psi_step = rad_2_deg(pixel_size / mask_radius_search);
-    //    psi_step = 360.0 / int(360.0 / psi_step + 0.5);
-    //}
-    //else {
-    //    psi_step = in_plane_angular_step;
-    //}
+    if ( in_plane_angular_step <= 0 ) {
+        psi_step = rad_2_deg(pixel_size / mask_radius_search);
+        psi_step = 360.0 / int(360.0 / psi_step + 0.5);
+    }
+    else {
+        psi_step = in_plane_angular_step;
+    }
 
     psi_start = psi_step / 2.0 * global_random_number_generator.GetUniformRandom();
     psi_start = 0.0f;
@@ -667,7 +667,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     global_euler_search.CalculateGridSearchPositions(false);
 
     // Append the 2D float array global_euler_search.number _of_search_positions
-    //s2_binning.Open( );
+    s2_binning.Open(s2_file, OPEN_TO_READ, 0);
     // for loop here
     for (int counter = 0; counter < num_lines_txt; counter ++){
         s2_binning.ReadLine(orientations);
