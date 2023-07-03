@@ -691,7 +691,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     
     ....Above commented [parts work */
 
-    s2_binning.Open(s2_file, OPEN_TO_READ, 0);
+    //s2_binning.Open(s2_file, OPEN_TO_READ, 0);
     for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
         s2_binning.ReadLine(orientations);
         global_euler_search.list_of_search_parameters[counter][0]=orientations[0];
