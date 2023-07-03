@@ -447,11 +447,6 @@ bool MatchTemplateApp::DoCalculation( ) {
     AnglesAndShifts angles;
 
     // S2 text file
-    float orientations[30];
-    float psi_file;
-    float theta_file;
-    float phi_file;
-    float num_lines_txt = 5;
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
 
     ImageFile input_search_image_file;
@@ -690,6 +685,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     
     
     ....Above commented [parts work */
+
+    float orientations[s2_binning.number_of_lines];
 
     //s2_binning.Open(s2_file, OPEN_TO_READ, 0);
     for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
