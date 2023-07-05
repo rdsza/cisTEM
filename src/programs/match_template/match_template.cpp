@@ -660,14 +660,14 @@ bool MatchTemplateApp::DoCalculation( ) {
     //    }
     //}
 
-    //global_euler_search.CalculateGridSearchPositions(false);
+    global_euler_search.CalculateGridSearchPositions(false);
 
     // to print all global_euler_search.number_of_search_positions; using 10 for debug
-    for (int i = 0; i < 10; i++)
-    {
-        wxPrintf("The list of search parameters, Phi : %12.6f \n", global_euler_search.list_of_search_parameters[i][0]);
-        wxPrintf("The list of search parameters, Theta : %12.6f \n", global_euler_search.list_of_search_parameters[i][1]);
-    }
+    //for (int i = 0; i < 10; i++)
+    //{
+    //    wxPrintf("The list of search parameters, Phi : %12.6f \n", global_euler_search.list_of_search_parameters[i][0]);
+    //    wxPrintf("The list of search parameters, Theta : %12.6f \n", global_euler_search.list_of_search_parameters[i][1]);
+    //}
     
 
     // Append the 2D float array global_euler_search.number _of_search_positions
