@@ -672,7 +672,7 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     // Append the 2D float array global_euler_search.number _of_search_positions
 
-    s2_binning.Open(s2_file, OPEN_TO_READ, 0);
+    ////s2_binning.Open(s2_file, OPEN_TO_READ, 0);
     float orientations[s2_binning.number_of_lines];
     // for loop here
     for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
