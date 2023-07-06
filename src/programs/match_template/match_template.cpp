@@ -674,11 +674,13 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     ////s2_binning.Open(s2_file, OPEN_TO_READ, 0);
     float orientations[s2_binning.number_of_lines];
+    Allocate2DFloatArray(list_of_search_parameters, s2_binning.number_of_lines, 2);
+    
     // for loop here
     for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
         s2_binning.ReadLine(orientations);
-        global_euler_search.list_of_search_parameters[counter][0]=orientations[0];
-        global_euler_search.list_of_search_parameters[counter][1]=orientations[1];
+        list_of_search_parameters[counter][0]=orientations[0];
+        list_of_search_parameters[counter][1]=orientations[1];
     }
     // s2_binning.ReadLine(orientations);
     //s2_binning.Close();
@@ -692,8 +694,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     
     for (int i = 0; i < s2_binning.number_of_lines; i++)
     {
-        wxPrintf("The list of search parameters, Phi : %12.6f \n", global_euler_search.list_of_search_parameters[i][0]);
-        wxPrintf("The list of search parameters, Theta : %12.6f \n", global_euler_search.list_of_search_parameters[i][1]);
+        wxPrintf("The list of search parameters, Phi : %12.6f \n", list_of_search_parameters[i][0]);
+        wxPrintf("The list of search parameters, Theta : %12.6f \n", list_of_search_parameters[i][1]);
     }
     s2_binning.Close();
 
