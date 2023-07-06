@@ -676,7 +676,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     float orientations[s2_binning.number_of_lines];
     float number_of_search_positions;
     number_of_search_positions = s2_binning.number_of_lines;
-    Allocate2DFloatArray(list_of_search_parameters, , 2);
+    Allocate2DFloatArray(list_of_search_parameters, number_of_search_positions, 2);
     
     // for loop here
     for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
