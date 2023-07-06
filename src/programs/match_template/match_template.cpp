@@ -629,25 +629,25 @@ bool MatchTemplateApp::DoCalculation( ) {
         mask_radius_search = particle_radius_angstroms;
 
     // orientations
-    //if ( angular_step <= 0 ) {
-    //    angular_step = CalculateAngularStep(high_resolution_limit_search, mask_radius_search);
-    //}
+    if ( angular_step <= 0 ) {
+        angular_step = CalculateAngularStep(high_resolution_limit_search, mask_radius_search);
+    }
 
-    //if ( in_plane_angular_step <= 0 ) {
-    //    psi_step = rad_2_deg(pixel_size / mask_radius_search);
-    //    psi_step = 360.0 / int(360.0 / psi_step + 0.5);
-    //}
-    //else {
-    //    psi_step = in_plane_angular_step;
-    //}
+    if ( in_plane_angular_step <= 0 ) {
+        psi_step = rad_2_deg(pixel_size / mask_radius_search);
+        psi_step = 360.0 / int(360.0 / psi_step + 0.5);
+    }
+    else {
+        psi_step = in_plane_angular_step;
+    }
 
-    //psi_start = psi_step / 2.0 * global_random_number_generator.GetUniformRandom();
-    //psi_start = 0.0f;
-    //psi_max   = 360.0f;
+    psi_start = psi_step / 2.0 * global_random_number_generator.GetUniformRandom();
+    psi_start = 0.0f;
+    psi_max   = 360.0f;
 
-    //psi_step = 5;
+    psi_step = 5;
 
-    //wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
+    wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
 
     // search grid
 
@@ -674,7 +674,9 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     ////s2_binning.Open(s2_file, OPEN_TO_READ, 0);
     float orientations[s2_binning.number_of_lines];
-    Allocate2DFloatArray(list_of_search_parameters, s2_binning.number_of_lines, 2);
+    float number_of_search_positions;
+    number_of_search_positions = s2_binning.number_of_lines;
+    Allocate2DFloatArray(list_of_search_parameters, , 2);
     
     // for loop here
     for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
@@ -737,7 +739,7 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     if ( is_running_locally == true ) {
         first_search_position = 0;
-        last_search_position  = global_euler_search.number_of_search_positions - 1;
+        last_search_position  = number_of_search_positions - 1;
     }
 
     // TODO unroll these loops and multiply the product.
