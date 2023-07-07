@@ -676,13 +676,13 @@ bool MatchTemplateApp::DoCalculation( ) {
     float orientations[s2_binning.number_of_lines];
     //float number_of_search_positions;
     number_of_search_positions = s2_binning.number_of_lines;
-    Allocate2DFloatArray(list_of_search_parameters, number_of_search_positions, 2);
+    Allocate2DFloatArray(global_euler_search.list_of_search_parameters, number_of_search_positions, 2);
     
     // for loop here
     for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
         s2_binning.ReadLine(orientations);
-        list_of_search_parameters[counter][0]=orientations[0];
-        list_of_search_parameters[counter][1]=orientations[1];
+        global_euler_search.list_of_search_parameters[counter][0]=orientations[0];
+        global_euler_search.list_of_search_parameters[counter][1]=orientations[1];
     }
     // s2_binning.ReadLine(orientations);
     //s2_binning.Close();
