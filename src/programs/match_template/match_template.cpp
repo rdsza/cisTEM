@@ -696,8 +696,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     
     for (int i = 0; i < s2_binning.number_of_lines; i++)
     {
-        wxPrintf("The list of search parameters, Phi : %12.6f \n", list_of_search_parameters[i][0]);
-        wxPrintf("The list of search parameters, Theta : %12.6f \n", list_of_search_parameters[i][1]);
+        wxPrintf("The list of search parameters, Phi : %12.6f \n", global_euler_search.list_of_search_parameters[i][0]);
+        wxPrintf("The list of search parameters, Theta : %12.6f \n", global_euler_search.list_of_search_parameters[i][1]);
     }
     s2_binning.Close();
 
