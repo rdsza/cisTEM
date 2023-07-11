@@ -645,13 +645,13 @@ bool MatchTemplateApp::DoCalculation( ) {
     psi_start = 0.0f;
     psi_max   = 360.0f;
 
-    psi_step = 5;
+    //psi_step = 5;
 
     wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
 
     // search grid
 
-    //global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
+    global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
     //if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
     //{
     //    if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
@@ -660,7 +660,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     //    }
     //}
 
-    global_euler_search.CalculateGridSearchPositions(false);
+    //global_euler_search.CalculateGridSearchPositions(false);
 
     // to print all global_euler_search.number_of_search_positions; using 10 for debug
     //for (int i = 0; i < 10; i++)
@@ -676,6 +676,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     float orientations[s2_binning.number_of_lines];
     //float number_of_search_positions;
     number_of_search_positions = s2_binning.number_of_lines;
+    global_euler_search.number_of_search_positions = number_of_search_positions;
     Allocate2DFloatArray(global_euler_search.list_of_search_parameters, number_of_search_positions, 2);
     
     // for loop here
