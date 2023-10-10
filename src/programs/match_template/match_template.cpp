@@ -603,7 +603,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     best_defocus.SetToConstant(0.0f);
 
     //RD 
-    (correlation_pixel_sum_write, input_image.real_memory_allocated);
+    //(correlation_pixel_sum_write, input_image.real_memory_allocated);
 
 
     ZeroDoubleArray(correlation_pixel_sum, input_image.real_memory_allocated);
@@ -1306,8 +1306,8 @@ bool MatchTemplateApp::DoCalculation( ) {
         //RD
         // write out per pixel correlation slices
         //possibly need a for loop for all correlation positions
-        something.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
-        something.QuickAndDirtyWriteSlice(corr_per_pix.ToStdString( ), correlation_pixel_sum_write,true, pixel_size);
+        //something.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
+        //something.QuickAndDirtyWriteSlice(corr_per_pix.ToStdString( ), correlation_pixel_sum_write,true, pixel_size);
         
         // write out histogram..
 
