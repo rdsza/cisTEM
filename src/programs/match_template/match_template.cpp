@@ -152,7 +152,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     float amplitude_contrast      = 0.07f;
     float defocus1                = 10000.0f;
     float defocus2                = 10000.0f;
-    ;
+    
     float    defocus_angle;
     float    phase_shift;
     float    low_resolution_limit      = 300.0;
@@ -167,7 +167,10 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     bool     ctf_refinement            = false;
     float    particle_radius_angstroms = 0.0f;
     wxString my_symmetry               = "C1";
+    // RD
     wxString s2_file ;
+    wxString corr_io_file_name ;
+
     float    in_plane_angular_step     = 0;
     bool     use_gpu_input             = false;
     int      max_threads               = 1; // Only used for the GPU code
@@ -211,7 +214,9 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
 #endif
+    // RD
     s2_file = my_input->GetFilenameFromUser("S2 orientations file","Columns containing user define Euler angles","orientations.txt", false);
+    corr_io_file_name = my_input->GetFilenameFromUser("Output per pixel correlation file", "Writing per pixel correlation for Outlier detection", "output_corr_per_pixel.mrc", false);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -265,7 +270,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads,s2_file.ToUTF8( ).data( ));
+                                      max_threads,s2_file.ToUTF8( ).data( ),corr_io_file_name.ToUTF8( ).data( ));
 }
 
 // override the do calculation method which will be what is actually run..
@@ -375,7 +380,9 @@ bool MatchTemplateApp::DoCalculation( ) {
     float    min_peak_radius                 = my_current_job.arguments[39].ReturnFloatArgument( );
     bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
+    //RD 
     wxString s2_file                         = my_current_job.arguments[42].ReturnStringArgument( );
+    wxString corr_io_file_name               = my_current_job.arguments[43].ReturnStringArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -446,8 +453,11 @@ bool MatchTemplateApp::DoCalculation( ) {
     EulerSearch     global_euler_search;
     AnglesAndShifts angles;
 
+    //RD 
     // S2 text file
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
+    // output per pixel correlation
+    Image corr_per_pix;
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
@@ -478,7 +488,6 @@ bool MatchTemplateApp::DoCalculation( ) {
     Image best_phi;
     Image best_defocus;
     Image best_pixel_size;
-
     Image correlation_pixel_sum_image;
     Image correlation_pixel_sum_of_squares_image;
 
@@ -580,6 +589,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     best_phi.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     best_defocus.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     best_pixel_size.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
+
     correlation_pixel_sum_image.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     correlation_pixel_sum_of_squares_image.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     double* correlation_pixel_sum            = new double[input_image.real_memory_allocated];
@@ -591,6 +601,10 @@ bool MatchTemplateApp::DoCalculation( ) {
     best_theta.SetToConstant(0.0f);
     best_phi.SetToConstant(0.0f);
     best_defocus.SetToConstant(0.0f);
+
+    //RD 
+    (correlation_pixel_sum_write, input_image.real_memory_allocated);
+
 
     ZeroDoubleArray(correlation_pixel_sum, input_image.real_memory_allocated);
     ZeroDoubleArray(correlation_pixel_sum_of_squares, input_image.real_memory_allocated);
@@ -771,6 +785,10 @@ bool MatchTemplateApp::DoCalculation( ) {
     for ( current_psi = psi_start; current_psi <= psi_max; current_psi += psi_step ) {
         number_of_rotations++;
     }
+
+    // RD
+    output_correlation_pixel.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, total_correlation_positions); // Maybe # of searches?
+    output_correlation_pixel.SetToConstant(0.0f);
 
     ProgressBar* my_progress;
 
@@ -1038,6 +1056,10 @@ bool MatchTemplateApp::DoCalculation( ) {
                     current_projection.DivideByConstant(sqrtf(variance));
                     current_projection.ClipIntoLargerRealSpace2D(&padded_reference);
 
+                    // RD
+                    // 1. Write the variance of the individual run and pixel into the file
+                    // 2. Write the mean using current_projection.ReturnAverageOfRealValues( )
+
                     padded_reference.ForwardFFT( );
                     // Zeroing the central pixel is probably not doing anything useful...
                     padded_reference.ZeroCentralPixel( );
@@ -1099,6 +1121,11 @@ bool MatchTemplateApp::DoCalculation( ) {
 
                         pixel_counter += padded_reference.padding_jump_value;
                     }
+
+                    // RD
+                    //for (pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
+                    //    correlation_pixel_sum_write[current_search_position] = padded_reference.real_values[pixel_counter];
+                    //}
 
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
@@ -1276,6 +1303,12 @@ bool MatchTemplateApp::DoCalculation( ) {
         best_pixel_size.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
         best_pixel_size.QuickAndDirtyWriteSlice(best_pixel_size_output_file.ToStdString( ), 1, pixel_size);
 
+        //RD
+        // write out per pixel correlation slices
+        //possibly need a for loop for all correlation positions
+        something.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
+        something.QuickAndDirtyWriteSlice(corr_per_pix.ToStdString( ), correlation_pixel_sum_write,true, pixel_size);
+        
         // write out histogram..
 
         temp_float = histogram_min + (histogram_step / 2.0f); // start position
