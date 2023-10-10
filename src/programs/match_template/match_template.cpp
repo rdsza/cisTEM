@@ -457,7 +457,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     // S2 text file
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
     // output per pixel correlation
-    Image corr_per_pix;
+    Image output_correlation_pixel;
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
