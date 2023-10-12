@@ -1059,8 +1059,9 @@ bool MatchTemplateApp::DoCalculation( ) {
                     // RD
                     // 1. Write the variance of the individual run and pixel into the file
                     // 2. Write the mean using current_projection.ReturnAverageOfRealValues( )
-
-                    output_correlation_pixel.WriteLine(current_projection.ReturnAverageOfRealValues( ));
+                    float mean;
+                    mean = current_projection.ReturnAverageOfRealValues( );
+                    output_correlation_pixel.WriteLine(mean);
                     
                     padded_reference.ForwardFFT( );
                     // Zeroing the central pixel is probably not doing anything useful...
