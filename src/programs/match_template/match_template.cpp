@@ -1058,9 +1058,9 @@ bool MatchTemplateApp::DoCalculation( ) {
                     // RD
                     // 1. Write the variance of the individual run and pixel into the file
                     // 2. Write the mean using current_projection.ReturnAverageOfRealValues( )
-                    double mean = 0.0;
-                    mean = current_projection.ReturnAverageOfRealValues( );
-                    output_correlation_pixel.WriteLine(mean);
+                    //double mean = 0.0;
+                    //mean = current_projection.ReturnAverageOfRealValues( );
+                    //output_correlation_pixel.WriteLine(mean);
                     
                     padded_reference.ForwardFFT( );
                     // Zeroing the central pixel is probably not doing anything useful...
@@ -1202,6 +1202,23 @@ bool MatchTemplateApp::DoCalculation( ) {
             correlation_pixel_sum_of_squares[pixel_counter] = (double)correlation_pixel_sum_of_squares_image.real_values[pixel_counter];
         }
     }
+
+    // RD
+    //RD
+    average_file.WriteCommentLine("MEan :");
+    for (int pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
+        correlation_pixel_sum[pixel_counter]            = (double)correlation_pixel_sum_image.real_values[pixel_counter];
+        average_file.WriteLine(correlation_pixel_sum[pixel_counter] );
+        //correlation_pixel_sum_of_squares[pixel_counter] = (double)correlation_pixel_sum_of_squares_image.real_values[pixel_counter];
+    }
+    //for ( int line_counter = 0; line_counter < histogram_number_of_points; line_counter++ ) {
+    //    temp_double_array[0] = temp_float + histogram_step * float(line_counter);
+    //    temp_double_array[1] = histogram_data[line_counter];
+    //    temp_double_array[2] = survival_histogram[line_counter];
+    //    temp_double_array[3] = expected_survival_histogram[line_counter];
+    //    average_file.WriteLine(temp_double_array);
+    //}
+    average_file.Close( );
 
     if ( is_running_locally == true ) {
         delete my_progress;
@@ -1347,17 +1364,7 @@ bool MatchTemplateApp::DoCalculation( ) {
 
         histogram_file.Close( );
 
-        //RD
-        average_file.WriteCommentLine("MEan :");
-        for ( int line_counter = 0; line_counter < histogram_number_of_points; line_counter++ ) {
-            temp_double_array[0] = temp_float + histogram_step * float(line_counter);
-            temp_double_array[1] = histogram_data[line_counter];
-            temp_double_array[2] = survival_histogram[line_counter];
-            temp_double_array[3] = expected_survival_histogram[line_counter];
-            average_file.WriteLine(temp_double_array);
-        }
-
-        average_file.Close( );
+        
 
         // memory cleanup
 
