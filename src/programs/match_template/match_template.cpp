@@ -169,7 +169,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     wxString my_symmetry               = "C1";
     // RD
     wxString s2_file ;
-    wxString corr_output_file ;
+    wxString output_average_file ;
 
     float    in_plane_angular_step     = 0;
     bool     use_gpu_input             = false;
@@ -216,7 +216,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 #endif
     // RD
     s2_file = my_input->GetFilenameFromUser("S2 orientations file","Columns containing user define Euler angles","orientations.txt", false);
-    corr_output_file = my_input->GetFilenameFromUser("Output per pixel correlation file", "Writing per pixel correlation for Outlier detection", "output_corr_per_pixel.txt", false);
+    output_average_file = my_input->GetFilenameFromUser("Output per pixel correlation file", "Writing per pixel correlation for Outlier detection", "output_corr_per_pixel.txt", false);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -270,7 +270,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads,s2_file.ToUTF8( ).data( ),corr_output_file.ToUTF8( ).data( ));
+                                      max_threads,s2_file.ToUTF8( ).data( ),output_average_file.ToUTF8( ).data( ));
 }
 
 // override the do calculation method which will be what is actually run..
@@ -382,7 +382,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
     //RD 
     wxString s2_file                         = my_current_job.arguments[42].ReturnStringArgument( );
-    wxString corr_output_file               = my_current_job.arguments[43].ReturnStringArgument( );
+    wxString output_average_file               = my_current_job.arguments[43].ReturnStringArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -456,8 +456,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     //RD 
     // S2 text file
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
-    // output per pixel correlation
-    NumericTextFile output_correlation_pixel(corr_output_file, OPEN_TO_WRITE, 1);
+    
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
@@ -1059,7 +1058,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                     // RD
                     // 1. Write the variance of the individual run and pixel into the file
                     // 2. Write the mean using current_projection.ReturnAverageOfRealValues( )
-                    float mean;
+                    double mean = 0.0;
                     mean = current_projection.ReturnAverageOfRealValues( );
                     output_correlation_pixel.WriteLine(mean);
                     
@@ -1317,6 +1316,10 @@ bool MatchTemplateApp::DoCalculation( ) {
         temp_float = histogram_min + (histogram_step / 2.0f); // start position
         NumericTextFile histogram_file(output_histogram_file, OPEN_TO_WRITE, 4);
 
+        // write out averages per pixel
+        // output per pixel correlation
+        NumericTextFile average_file(output_average_file, OPEN_TO_WRITE, 4); 
+
         double* expected_survival_histogram = new double[histogram_number_of_points];
         double* survival_histogram          = new double[histogram_number_of_points];
         ZeroDoubleArray(survival_histogram, histogram_number_of_points);
@@ -1343,6 +1346,18 @@ bool MatchTemplateApp::DoCalculation( ) {
         }
 
         histogram_file.Close( );
+
+        //RD
+        average_file.WriteCommentLine("MEan :");
+        for ( int line_counter = 0; line_counter < histogram_number_of_points; line_counter++ ) {
+            temp_double_array[0] = temp_float + histogram_step * float(line_counter);
+            temp_double_array[1] = histogram_data[line_counter];
+            temp_double_array[2] = survival_histogram[line_counter];
+            temp_double_array[3] = expected_survival_histogram[line_counter];
+            average_file.WriteLine(temp_double_array);
+        }
+
+        average_file.Close( );
 
         // memory cleanup
 
