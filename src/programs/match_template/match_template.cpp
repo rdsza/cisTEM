@@ -1206,9 +1206,10 @@ bool MatchTemplateApp::DoCalculation( ) {
     // RD
     // write out averages per pixel
     // output per pixel correlation
-    double per_pixel_average[input_image.real_memory_allocated];
+    //double per_pixel_average[input_image.real_memory_allocated];
     NumericTextFile average_file(output_average_file, OPEN_TO_WRITE, 4); 
     average_file.WriteCommentLine("MEan :");
+    average_file.Close( );
     //for (int pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
     //    per_pixel_average[pixel_counter] = (double)correlation_pixel_sum_image.real_values[pixel_counter];
     //    average_file.WriteLine(per_pixel_average);
@@ -1221,7 +1222,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     //    temp_double_array[3] = expected_survival_histogram[line_counter];
     //    average_file.WriteLine(temp_double_array);
     //}
-    average_file.Close( );
+    
 
     if ( is_running_locally == true ) {
         delete my_progress;
