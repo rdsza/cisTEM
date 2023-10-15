@@ -803,6 +803,11 @@ bool MatchTemplateApp::DoCalculation( ) {
     //    wxPrintf("Searching %i - %i of %i total positions\n", first_search_position, last_search_position, global_euler_search.number_of_search_positions);
     //    wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
 
+    // RD test for average
+    NumericTextFile average_file(output_average_file, OPEN_TO_WRITE, 4); 
+    average_file.WriteCommentLine("MEan :");
+    average_file.Close( );
+
     actual_number_of_ccs_calculated = 0.0;
 
     wxDateTime overall_start;
@@ -1207,9 +1212,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     // write out averages per pixel
     // output per pixel correlation
     //double per_pixel_average[input_image.real_memory_allocated];
-    NumericTextFile average_file(output_average_file, OPEN_TO_WRITE, 4); 
-    average_file.WriteCommentLine("MEan :");
-    average_file.Close( );
+    
     //for (int pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
     //    per_pixel_average[pixel_counter] = (double)correlation_pixel_sum_image.real_values[pixel_counter];
     //    average_file.WriteLine(per_pixel_average);
