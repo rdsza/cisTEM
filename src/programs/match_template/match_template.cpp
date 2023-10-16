@@ -169,7 +169,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     wxString my_symmetry               = "C1";
     // RD
     wxString s2_file ;
-    wxString cc_output_file ;
+    //wxString cc_output_file ;
 
     float    in_plane_angular_step     = 0;
     bool     use_gpu_input             = false;
@@ -216,7 +216,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 #endif
     // RD
     s2_file = my_input->GetFilenameFromUser("S2 orientations file","Columns containing user define Euler angles","orientations.txt", false);
-    cc_output_file = my_input->GetFilenameFromUser("Output per pixel correlation file", "Writing per pixel correlation for Outlier detection", "output_corr_per_pixel.mrc", false);
+    //cc_output_file = my_input->GetFilenameFromUser("Output per pixel correlation file", "Writing per pixel correlation for Outlier detection", "output_corr_per_pixel.mrc", false);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -229,7 +229,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 
     delete my_input;
 
-    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbitt", input_search_images.ToUTF8( ).data( ),
+    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbit", input_search_images.ToUTF8( ).data( ),
                                       input_reconstruction.ToUTF8( ).data( ),
                                       pixel_size,
                                       voltage_kV,
@@ -270,7 +270,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads,s2_file.ToUTF8( ).data( ),cc_output_file.ToUTF8( ).data( ));
+                                      max_threads,s2_file.ToUTF8( ).data( ));//,cc_output_file.ToUTF8( ).data( ));
 }
 
 // override the do calculation method which will be what is actually run..
@@ -382,7 +382,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
     //RD 
     wxString s2_file                         = my_current_job.arguments[42].ReturnStringArgument( );
-    wxString output_average_file               = my_current_job.arguments[43].ReturnStringArgument( );
+    //wxString output_average_file               = my_current_job.arguments[43].ReturnStringArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -458,8 +458,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
 
     // RD
-    output_correlation_pixel.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1); // Number of files = Number of searches * in--plane rotation
-    output_correlation_pixel.SetToConstant(0.0f);
+    //output_correlation_pixel.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1); // Number of files = Number of searches * in--plane rotation
+    //output_correlation_pixel.SetToConstant(0.0f);
     
 
     ImageFile input_search_image_file;
@@ -1185,25 +1185,6 @@ bool MatchTemplateApp::DoCalculation( ) {
             correlation_pixel_sum_of_squares[pixel_counter] = (double)correlation_pixel_sum_of_squares_image.real_values[pixel_counter];
         }
     }
-
-    // RD
-    // write out averages per pixel
-    // output per pixel correlation
-    double per_pixel_average[input_image.real_memory_allocated];
-    
-    for (int pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
-        per_pixel_average[pixel_counter] = (double)correlation_pixel_sum_image.real_values[pixel_counter];
-        average_file.WriteLine(per_pixel_average);
-    }
-    //correlation_pixel_sum_of_squares[pixel_counter] = (double)correlation_pixel_sum_of_squares_image.real_values[pixel_counter];
-    //for ( int line_counter = 0; line_counter < histogram_number_of_points; line_counter++ ) {
-    //    temp_double_array[0] = temp_float + histogram_step * float(line_counter);
-    //    temp_double_array[1] = histogram_data[line_counter];
-    //    temp_double_array[2] = survival_histogram[line_counter];
-    //    temp_double_array[3] = expected_survival_histogram[line_counter];
-    //    average_file.WriteLine(temp_double_array);
-    //}
-    average_file.Close( );
     
 
     if ( is_running_locally == true ) {
@@ -1311,7 +1292,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         //RD
         // write out per pixel correlation slices
         //possibly need a for loop for all correlation positions
-        correlation_pixel_sum_of_squares_image.QuickAndDirtyWriteSlice(cc_output_file.ToStdString( ), 1, pixel_size);
+        //correlation_pixel_sum_of_squares_image.QuickAndDirtyWriteSlice(cc_output_file.ToStdString( ), 1, pixel_size);
         
         // write out histogram..
 
