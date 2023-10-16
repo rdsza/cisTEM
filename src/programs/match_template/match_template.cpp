@@ -805,8 +805,8 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     // RD test for average
     NumericTextFile average_file(output_average_file, OPEN_TO_WRITE, 4); 
-    average_file.WriteCommentLine("MEan :");
-    average_file.Close( );
+    average_file.WriteCommentLine("Mean :");
+    
 
     actual_number_of_ccs_calculated = 0.0;
 
@@ -1211,12 +1211,12 @@ bool MatchTemplateApp::DoCalculation( ) {
     // RD
     // write out averages per pixel
     // output per pixel correlation
-    //double per_pixel_average[input_image.real_memory_allocated];
+    double per_pixel_average[input_image.real_memory_allocated];
     
-    //for (int pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
-    //    per_pixel_average[pixel_counter] = (double)correlation_pixel_sum_image.real_values[pixel_counter];
-    //    average_file.WriteLine(per_pixel_average);
-    //}
+    for (int pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
+        per_pixel_average[pixel_counter] = (double)correlation_pixel_sum_image.real_values[pixel_counter];
+        average_file.WriteLine(per_pixel_average);
+    }
     //correlation_pixel_sum_of_squares[pixel_counter] = (double)correlation_pixel_sum_of_squares_image.real_values[pixel_counter];
     //for ( int line_counter = 0; line_counter < histogram_number_of_points; line_counter++ ) {
     //    temp_double_array[0] = temp_float + histogram_step * float(line_counter);
@@ -1225,6 +1225,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     //    temp_double_array[3] = expected_survival_histogram[line_counter];
     //    average_file.WriteLine(temp_double_array);
     //}
+    average_file.Close( );
     
 
     if ( is_running_locally == true ) {
