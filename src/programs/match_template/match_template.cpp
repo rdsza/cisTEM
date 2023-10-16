@@ -457,9 +457,6 @@ bool MatchTemplateApp::DoCalculation( ) {
     // S2 text file
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
 
-    // RD test for average
-    //Image average_file(output_average_file); //, OPEN_TO_WRITE, 4); 
-    //average_file.WriteCommentLine("Mean :");
     // RD
     output_correlation_pixel.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1); // Number of files = Number of searches * in--plane rotation
     output_correlation_pixel.SetToConstant(0.0f);
@@ -690,11 +687,9 @@ bool MatchTemplateApp::DoCalculation( ) {
     //}
     
 
+    //RD
     // Append the 2D float array global_euler_search.number _of_search_positions
-
-    ////s2_binning.Open(s2_file, OPEN_TO_READ, 0);
     float orientations[s2_binning.number_of_lines];
-    //float number_of_search_positions;
     number_of_search_positions = s2_binning.number_of_lines;
     global_euler_search.number_of_search_positions = number_of_search_positions;
     Allocate2DFloatArray(global_euler_search.list_of_search_parameters, number_of_search_positions, 2);
@@ -705,24 +700,8 @@ bool MatchTemplateApp::DoCalculation( ) {
         global_euler_search.list_of_search_parameters[counter][0]=orientations[0];
         global_euler_search.list_of_search_parameters[counter][1]=orientations[1];
     }
-    // s2_binning.ReadLine(orientations);
-    //s2_binning.Close();
-    
-    
-    //....Above commented [parts work */
 
-    
-    ////s2_binning.Open(s2_file, OPEN_TO_READ, 0);
-    //
-    
-    // Debug
-    //for (int i = 0; i < s2_binning.number_of_lines; i++)
-    //{
-    //    wxPrintf("The list of search parameters, Phi : %12.6f \n", global_euler_search.list_of_search_parameters[i][0]);
-    //    wxPrintf("The list of search parameters, Theta : %12.6f \n", global_euler_search.list_of_search_parameters[i][1]);
-    //}
     s2_binning.Close();
-
 
     // for now, I am assuming the MTF has been applied already.
     // work out the filter to just whiten the image..
@@ -1058,13 +1037,6 @@ bool MatchTemplateApp::DoCalculation( ) {
                     variance = current_projection.ReturnSumOfSquares( ) * current_projection.number_of_real_space_pixels / padded_reference.number_of_real_space_pixels - powf(current_projection.ReturnAverageOfRealValues( ) * current_projection.number_of_real_space_pixels / padded_reference.number_of_real_space_pixels, 2);
                     current_projection.DivideByConstant(sqrtf(variance));
                     current_projection.ClipIntoLargerRealSpace2D(&padded_reference);
-
-                    // RD
-                    // 1. Write the variance of the individual run and pixel into the file
-                    // 2. Write the mean using current_projection.ReturnAverageOfRealValues( )
-                    //double mean = 0.0;
-                    //mean = current_projection.ReturnAverageOfRealValues( );
-                    //output_correlation_pixel.WriteLine(mean);
                     
                     padded_reference.ForwardFFT( );
                     // Zeroing the central pixel is probably not doing anything useful...
@@ -1083,7 +1055,14 @@ bool MatchTemplateApp::DoCalculation( ) {
 #endif
 
                     padded_reference.BackwardFFT( );
-                    //                    padded_reference.QuickAndDirtyWriteSlice("cc.mrc", 1);
+                    
+                    //RD
+                    padded_reference.QuickAndDirtyWriteSlice(wxString::Format("%i_cc.mrc",current_search_position).ToStdString(), 1);
+                    //Test
+                    //padded_reference.QuickAndDirtyWriteSlice("cc.mrc", current_search_position).ToStdString(), 1);
+                    //.QuickAndDirtyWriteSlice("cc.mrc", 1);
+
+
                     //                    exit(0);
 
                     //                    for (pixel_counter = 0; pixel_counter <  padded_reference.real_memory_allocated; pixel_counter++)
