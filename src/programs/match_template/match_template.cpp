@@ -456,6 +456,13 @@ bool MatchTemplateApp::DoCalculation( ) {
     //RD 
     // S2 text file
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
+
+    // RD test for average
+    Image average_file(output_average_file); //, OPEN_TO_WRITE, 4); 
+    //average_file.WriteCommentLine("Mean :");
+    // RD
+    output_correlation_pixel.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1); // Number of files = Number of searches * in--plane rotation
+    output_correlation_pixel.SetToConstant(0.0f);
     
 
     ImageFile input_search_image_file;
@@ -785,10 +792,6 @@ bool MatchTemplateApp::DoCalculation( ) {
         number_of_rotations++;
     }
 
-    // RD
-    //output_correlation_pixel.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1); // Maybe # of searches?
-    //output_correlation_pixel.SetToConstant(0.0f);
-
     ProgressBar* my_progress;
 
     //Loop over ever search position
@@ -802,10 +805,6 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     //    wxPrintf("Searching %i - %i of %i total positions\n", first_search_position, last_search_position, global_euler_search.number_of_search_positions);
     //    wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
-
-    // RD test for average
-    NumericTextFile average_file(output_average_file, OPEN_TO_WRITE, 4); 
-    average_file.WriteCommentLine("Mean :");
     
 
     actual_number_of_ccs_calculated = 0.0;
@@ -1333,8 +1332,8 @@ bool MatchTemplateApp::DoCalculation( ) {
         //RD
         // write out per pixel correlation slices
         //possibly need a for loop for all correlation positions
-        //something.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
-        //something.QuickAndDirtyWriteSlice(corr_per_pix.ToStdString( ), correlation_pixel_sum_write,true, pixel_size);
+        //output_average_file.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
+        output_average_file.QuickAndDirtyWriteSlice(corr_per_pix.ToStdString( ), correlation_pixel_sum_write,true, pixel_size);
         
         // write out histogram..
 
