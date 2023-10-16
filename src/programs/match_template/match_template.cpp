@@ -169,7 +169,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     wxString my_symmetry               = "C1";
     // RD
     wxString s2_file ;
-    wxString output_average_file ;
+    wxString cc_output_file ;
 
     float    in_plane_angular_step     = 0;
     bool     use_gpu_input             = false;
@@ -216,7 +216,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 #endif
     // RD
     s2_file = my_input->GetFilenameFromUser("S2 orientations file","Columns containing user define Euler angles","orientations.txt", false);
-    output_average_file = my_input->GetFilenameFromUser("Output per pixel correlation file", "Writing per pixel correlation for Outlier detection", "output_corr_per_pixel.txt", false);
+    cc_output_file = my_input->GetFilenameFromUser("Output per pixel correlation file", "Writing per pixel correlation for Outlier detection", "output_corr_per_pixel.mrc", false);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -270,7 +270,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads,s2_file.ToUTF8( ).data( ),output_average_file.ToUTF8( ).data( ));
+                                      max_threads,s2_file.ToUTF8( ).data( ),cc_output_file.ToUTF8( ).data( ));
 }
 
 // override the do calculation method which will be what is actually run..
@@ -458,7 +458,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
 
     // RD test for average
-    Image average_file(output_average_file); //, OPEN_TO_WRITE, 4); 
+    //Image average_file(output_average_file); //, OPEN_TO_WRITE, 4); 
     //average_file.WriteCommentLine("Mean :");
     // RD
     output_correlation_pixel.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1); // Number of files = Number of searches * in--plane rotation
@@ -609,7 +609,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     best_defocus.SetToConstant(0.0f);
 
     //RD 
-    //(correlation_pixel_sum_write, input_image.real_memory_allocated);
+    //correlation_pixel_sum_write, input_image.real_memory_allocated);
 
 
     ZeroDoubleArray(correlation_pixel_sum, input_image.real_memory_allocated);
@@ -1130,7 +1130,7 @@ bool MatchTemplateApp::DoCalculation( ) {
 
                     // RD
                     //for (pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
-                    //    correlation_pixel_sum_write[current_search_position] = padded_reference.real_values[pixel_counter];
+                     //   correlation_pixel_sum_write[current_search_position] = padded_reference.real_values[pixel_counter];
                     //}
 
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
@@ -1317,7 +1317,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         correlation_pixel_sum_image.Resize(original_input_image_x, original_input_image_y, 1, correlation_pixel_sum_image.ReturnAverageOfRealValuesOnEdges( ));
         correlation_pixel_sum_image.QuickAndDirtyWriteSlice(correlation_avg_output_file.ToStdString( ), 1, pixel_size);
         correlation_pixel_sum_of_squares_image.Resize(original_input_image_x, original_input_image_y, 1, correlation_pixel_sum_of_squares_image.ReturnAverageOfRealValuesOnEdges( ));
-        correlation_pixel_sum_of_squares_image.QuickAndDirtyWriteSlice(correlation_std_output_file.ToStdString( ), 1, pixel_size);
+        
         best_psi.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
         best_psi.QuickAndDirtyWriteSlice(best_psi_output_file.ToStdString( ), 1, pixel_size);
         best_theta.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
@@ -1332,8 +1332,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         //RD
         // write out per pixel correlation slices
         //possibly need a for loop for all correlation positions
-        //output_average_file.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
-        output_average_file.QuickAndDirtyWriteSlice(corr_per_pix.ToStdString( ), correlation_pixel_sum_write,true, pixel_size);
+        correlation_pixel_sum_of_squares_image.QuickAndDirtyWriteSlice(cc_output_file.ToStdString( ), 1, pixel_size);
         
         // write out histogram..
 
