@@ -1107,11 +1107,6 @@ bool MatchTemplateApp::DoCalculation( ) {
                         pixel_counter += padded_reference.padding_jump_value;
                     }
 
-                    // RD
-                    //for (pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
-                     //   correlation_pixel_sum_write[current_search_position] = padded_reference.real_values[pixel_counter];
-                    //}
-
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
                         correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];

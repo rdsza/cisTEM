@@ -178,6 +178,7 @@ void TemplateMatchingCore::RunInnerLoop(Image& projection_filter, float c_pixel,
             current_projection.SwapRealSpaceQuadrants( );
             current_projection.MultiplyPixelWise(projection_filter);
             current_projection.BackwardFFT( );
+            current_projection.QuickAndDirtyWriteSlice(wxString::Format("%i_psi_%i_cc.mrc",current_search_position,current_psi).ToStdString(), 1);
             average_on_edge  = current_projection.ReturnAverageOfRealValuesOnEdges( );
             average_of_reals = current_projection.ReturnAverageOfRealValues( ) - average_on_edge;
 
