@@ -87,7 +87,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     float amplitude_contrast      = 0.07f;
     float defocus1                = 10000.0f;
     float defocus2                = 10000.0f;
-    ;
+    
     float    defocus_angle;
     float    phase_shift;
     float    low_resolution_limit      = 300.0;
@@ -102,6 +102,10 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     bool     ctf_refinement            = false;
     float    particle_radius_angstroms = 0.0f;
     wxString my_symmetry               = "C1";
+    // RD
+    wxString s2_file ;
+    //wxString cc_output_file ;
+
     float    in_plane_angular_step     = 0;
     bool     use_gpu_input             = false;
     int      max_threads               = 1; // Only used for the GPU code
@@ -145,6 +149,9 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
 #endif
+    // RD
+    s2_file = my_input->GetFilenameFromUser("S2 orientations file","Columns containing user define Euler angles","orientations.txt", false);
+    //cc_output_file = my_input->GetFilenameFromUser("Output per pixel correlation file", "Writing per pixel correlation for Outlier detection", "output_corr_per_pixel.mrc", false);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -157,7 +164,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 
     delete my_input;
 
-    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbi", input_search_images.ToUTF8( ).data( ),
+    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbit", input_search_images.ToUTF8( ).data( ),
                                       input_reconstruction.ToUTF8( ).data( ),
                                       pixel_size,
                                       voltage_kV,
@@ -198,7 +205,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads);
+                                      max_threads,s2_file.ToUTF8( ).data( ));//,cc_output_file.ToUTF8( ).data( ));
 }
 
 // override the do calculation method which will be what is actually run..
@@ -256,6 +263,9 @@ bool MatchTemplateApp::DoCalculation( ) {
     float    min_peak_radius                 = my_current_job.arguments[39].ReturnFloatArgument( );
     bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
+    //RD 
+    wxString s2_file                         = my_current_job.arguments[42].ReturnStringArgument( );
+    //wxString output_average_file               = my_current_job.arguments[43].ReturnStringArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -316,6 +326,8 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     int i;
 
+    int number_of_search_positions = 0;
+
     long   original_input_image_x;
     long   original_input_image_y;
     int    remove_npix_from_edge = 0;
@@ -323,6 +335,15 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     EulerSearch     global_euler_search;
     AnglesAndShifts angles;
+
+    //RD 
+    // S2 text file
+    NumericTextFile s2_binning(s2_file, OPEN_TO_READ, 0);
+
+    // RD
+    //output_correlation_pixel.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1); // Number of files = Number of searches * in--plane rotation
+    //output_correlation_pixel.SetToConstant(0.0f);
+    
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
@@ -353,7 +374,6 @@ bool MatchTemplateApp::DoCalculation( ) {
     Image best_phi;
     Image best_defocus;
     Image best_pixel_size;
-
     Image correlation_pixel_sum_image;
     Image correlation_pixel_sum_of_squares_image;
 
@@ -455,6 +475,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     best_phi.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     best_defocus.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     best_pixel_size.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
+
     correlation_pixel_sum_image.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     correlation_pixel_sum_of_squares_image.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     double* correlation_pixel_sum            = new double[input_image.real_memory_allocated];
@@ -466,6 +487,10 @@ bool MatchTemplateApp::DoCalculation( ) {
     best_theta.SetToConstant(0.0f);
     best_phi.SetToConstant(0.0f);
     best_defocus.SetToConstant(0.0f);
+
+    //RD 
+    //correlation_pixel_sum_write, input_image.real_memory_allocated);
+
 
     ZeroDoubleArray(correlation_pixel_sum, input_image.real_memory_allocated);
     ZeroDoubleArray(correlation_pixel_sum_of_squares, input_image.real_memory_allocated);
@@ -503,6 +528,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     else
         mask_radius_search = particle_radius_angstroms;
 
+    // orientations
     if ( angular_step <= 0 ) {
         angular_step = CalculateAngularStep(high_resolution_limit_search, mask_radius_search);
     }
@@ -515,26 +541,50 @@ bool MatchTemplateApp::DoCalculation( ) {
         psi_step = in_plane_angular_step;
     }
 
-    //psi_start = psi_step / 2.0 * global_random_number_generator.GetUniformRandom();
+    psi_start = psi_step / 2.0 * global_random_number_generator.GetUniformRandom();
     psi_start = 0.0f;
     psi_max   = 360.0f;
 
     //psi_step = 5;
 
-    //wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
+    wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
 
     // search grid
 
     global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
-    if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
-    {
-        if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
-        {
-            global_euler_search.theta_max = 180.0f;
-        }
+    //if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
+    //{
+    //    if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
+    //    {
+    //       global_euler_search.theta_max = 180.0f;
+    //    }
+    //}
+
+    //global_euler_search.CalculateGridSearchPositions(false);
+
+    // to print all global_euler_search.number_of_search_positions; using 10 for debug
+    //for (int i = 0; i < 10; i++)
+    //{
+    //    wxPrintf("The list of search parameters, Phi : %12.6f \n", global_euler_search.list_of_search_parameters[i][0]);
+    //    wxPrintf("The list of search parameters, Theta : %12.6f \n", global_euler_search.list_of_search_parameters[i][1]);
+    //}
+    
+
+    //RD
+    // Append the 2D float array global_euler_search.number _of_search_positions
+    float orientations[s2_binning.number_of_lines];
+    number_of_search_positions = s2_binning.number_of_lines;
+    global_euler_search.number_of_search_positions = number_of_search_positions;
+    Allocate2DFloatArray(global_euler_search.list_of_search_parameters, number_of_search_positions, 2);
+    
+    // for loop here
+    for (int counter = 0; counter < s2_binning.number_of_lines; counter ++){
+        s2_binning.ReadLine(orientations);
+        global_euler_search.list_of_search_parameters[counter][0]=orientations[0];
+        global_euler_search.list_of_search_parameters[counter][1]=orientations[1];
     }
 
-    global_euler_search.CalculateGridSearchPositions(false);
+    s2_binning.Close();
 
     // for now, I am assuming the MTF has been applied already.
     // work out the filter to just whiten the image..
@@ -573,7 +623,7 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     if ( is_running_locally == true ) {
         first_search_position = 0;
-        last_search_position  = global_euler_search.number_of_search_positions - 1;
+        last_search_position  = number_of_search_positions - 1;
     }
 
     // TODO unroll these loops and multiply the product.
@@ -617,6 +667,7 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     //    wxPrintf("Searching %i - %i of %i total positions\n", first_search_position, last_search_position, global_euler_search.number_of_search_positions);
     //    wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
+    
 
     actual_number_of_ccs_calculated = 0.0;
 
@@ -869,7 +920,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                     variance = current_projection.ReturnSumOfSquares( ) * current_projection.number_of_real_space_pixels / padded_reference.number_of_real_space_pixels - powf(current_projection.ReturnAverageOfRealValues( ) * current_projection.number_of_real_space_pixels / padded_reference.number_of_real_space_pixels, 2);
                     current_projection.DivideByConstant(sqrtf(variance));
                     current_projection.ClipIntoLargerRealSpace2D(&padded_reference);
-
+                    
                     padded_reference.ForwardFFT( );
                     // Zeroing the central pixel is probably not doing anything useful...
                     padded_reference.ZeroCentralPixel( );
@@ -887,7 +938,14 @@ bool MatchTemplateApp::DoCalculation( ) {
 #endif
 
                     padded_reference.BackwardFFT( );
-                    //                    padded_reference.QuickAndDirtyWriteSlice("cc.mrc", 1);
+                    
+                    //RD
+                    padded_reference.QuickAndDirtyWriteSlice(wxString::Format("%i_psi_%f_cc.mrc",current_search_position,current_psi).ToStdString(), 1);
+                    //Test
+                    //padded_reference.QuickAndDirtyWriteSlice("cc.mrc", current_search_position).ToStdString(), 1);
+                    //.QuickAndDirtyWriteSlice("cc.mrc", 1);
+
+
                     //                    exit(0);
 
                     //                    for (pixel_counter = 0; pixel_counter <  padded_reference.real_memory_allocated; pixel_counter++)
@@ -1005,6 +1063,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             correlation_pixel_sum_of_squares[pixel_counter] = (double)correlation_pixel_sum_of_squares_image.real_values[pixel_counter];
         }
     }
+    
 
     if ( is_running_locally == true ) {
         delete my_progress;
@@ -1096,7 +1155,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         correlation_pixel_sum_image.Resize(original_input_image_x, original_input_image_y, 1, correlation_pixel_sum_image.ReturnAverageOfRealValuesOnEdges( ));
         correlation_pixel_sum_image.QuickAndDirtyWriteSlice(correlation_avg_output_file.ToStdString( ), 1, pixel_size);
         correlation_pixel_sum_of_squares_image.Resize(original_input_image_x, original_input_image_y, 1, correlation_pixel_sum_of_squares_image.ReturnAverageOfRealValuesOnEdges( ));
-        correlation_pixel_sum_of_squares_image.QuickAndDirtyWriteSlice(correlation_std_output_file.ToStdString( ), 1, pixel_size);
+        
         best_psi.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
         best_psi.QuickAndDirtyWriteSlice(best_psi_output_file.ToStdString( ), 1, pixel_size);
         best_theta.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
@@ -1108,6 +1167,11 @@ bool MatchTemplateApp::DoCalculation( ) {
         best_pixel_size.Resize(original_input_image_x, original_input_image_y, 1, 0.0f);
         best_pixel_size.QuickAndDirtyWriteSlice(best_pixel_size_output_file.ToStdString( ), 1, pixel_size);
 
+        //RD
+        // write out per pixel correlation slices
+        //possibly need a for loop for all correlation positions
+        //correlation_pixel_sum_of_squares_image.QuickAndDirtyWriteSlice(cc_output_file.ToStdString( ), 1, pixel_size);
+        
         // write out histogram..
 
         temp_float = histogram_min + (histogram_step / 2.0f); // start position
@@ -1139,6 +1203,8 @@ bool MatchTemplateApp::DoCalculation( ) {
         }
 
         histogram_file.Close( );
+
+        
 
         // memory cleanup
 
