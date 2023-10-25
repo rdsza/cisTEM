@@ -195,9 +195,10 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
         if ( RelionRadioButton->GetValue( ) == true || Relion3RadioButton->GetValue( ) == true ) {
             wxFileName output_stack_filename                 = ParticleStackFileTextCtrl->GetLineText(0);
             wxFileName relion_star_filename                  = MetaDataFileTextCtrl->GetLineText(0); // one line per particle
-            wxFileName relion_corrected_micrographs_filename = MetaDataFileTextCtrl->GetLineText(0); // one line per motion-corrected movie
-            wxFileName relion_motioncor_star_base_filename   = MetaDataFileTextCtrl->GetLineText(0); // one star file per movie, with one line per frame
-            wxFileName relion_motioncor_star_current_filename;
+            //RD
+            //wxFileName relion_corrected_micrographs_filename = MetaDataFileTextCtrl->GetLineText(0); // one line per motion-corrected movie
+            //wxFileName relion_motioncor_star_base_filename   = MetaDataFileTextCtrl->GetLineText(0); // one star file per movie, with one line per frame
+            //wxFileName relion_motioncor_star_current_filename;
 
             wxFileName gain_ref_filename;
             bool       should_convert_gain_ref;
@@ -208,14 +209,15 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
             }
 
             relion_star_filename.SetExt("star");
-            relion_corrected_micrographs_filename.ClearExt( );
-            relion_corrected_micrographs_filename.SetName(relion_corrected_micrographs_filename.GetName( ) + wxT("_corrected_micrographs.star"));
-            relion_motioncor_star_base_filename.ClearExt( );
-            relion_motioncor_star_base_filename.SetName(relion_motioncor_star_base_filename.GetName( ) + wxT("_motioncorr"));
+            //RD
+            //relion_corrected_micrographs_filename.ClearExt( );
+            //relion_corrected_micrographs_filename.SetName(relion_corrected_micrographs_filename.GetName( ) + wxT("_corrected_micrographs.star"));
+            //relion_motioncor_star_base_filename.ClearExt( );
+            //relion_motioncor_star_base_filename.SetName(relion_motioncor_star_base_filename.GetName( ) + wxT("_motioncorr"));
 
             wxTextFile* relion_star_file                  = new wxTextFile(relion_star_filename.GetFullPath( ));
-            wxTextFile* relion_corrected_micrographs_file = new wxTextFile(relion_corrected_micrographs_filename.GetFullPath( ));
-            wxTextFile* relion_motioncor_star_current_file;
+            //wxTextFile* relion_corrected_micrographs_file = new wxTextFile(relion_corrected_micrographs_filename.GetFullPath( ));
+            //wxTextFile* relion_motioncor_star_current_file;
 
             wxArrayInt array_of_unique_parent_image_asset_ids;
             bool       current_particle_is_first_from_this_image;
@@ -227,7 +229,7 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
 
             double particle_radius = current_package->estimated_particle_size_in_angstroms / 2;
 
-            wxString micrograph_filename;
+            //wxString micrograph_filename;
             float    original_movie_pixel_size;
 
             int random_subset;
@@ -235,7 +237,7 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
             RefinementPackageParticleInfo current_particle;
             RefinementResult              current_refinement_result;
             ImageAsset*                   current_image_asset;
-            MovieAsset*                   current_movie_asset;
+            //MovieAsset*                   current_movie_asset;
 
             if ( relion_star_file->Exists( ) ) {
                 relion_star_file->Open( );
@@ -245,13 +247,13 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
                 relion_star_file->Create( );
             }
 
-            if ( relion_corrected_micrographs_file->Exists( ) ) {
-                relion_corrected_micrographs_file->Open( );
-                relion_corrected_micrographs_file->Clear( );
-            }
-            else {
-                relion_corrected_micrographs_file->Create( );
-            }
+            //if ( relion_corrected_micrographs_file->Exists( ) ) {
+            //    relion_corrected_micrographs_file->Open( );
+            //    relion_corrected_micrographs_file->Clear( );
+            //}
+            //else {
+            //    relion_corrected_micrographs_file->Create( );
+            //}
 
             //write optics data block for relion3.1 format
             if ( Relion3RadioButton->GetValue( ) == true ) {
@@ -286,24 +288,24 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
                                                            2));
 
                 // The corrected micrographs star file
-                relion_corrected_micrographs_file->AddLine(wxString(" "));
-                relion_corrected_micrographs_file->AddLine(wxString("data_optics"));
-                relion_corrected_micrographs_file->AddLine(wxString(" "));
-                relion_corrected_micrographs_file->AddLine(wxString("loop_"));
-                relion_corrected_micrographs_file->AddLine(wxString("_rlnOpticsGroupName #1"));
-                relion_corrected_micrographs_file->AddLine(wxString("_rlnOpticsGroup #2"));
-                relion_corrected_micrographs_file->AddLine(wxString("_rlnMicrographOriginalPixelSize #3"));
-                relion_corrected_micrographs_file->AddLine(wxString("_rlnVoltage #4"));
-                relion_corrected_micrographs_file->AddLine(wxString("_rlnSphericalAberration #5"));
-                relion_corrected_micrographs_file->AddLine(wxString("_rlnAmplitudeContrast #6"));
-                relion_corrected_micrographs_file->AddLine(wxString("_rlnMicrographPixelSize #7"));
+                //relion_corrected_micrographs_file->AddLine(wxString(" "));
+                //relion_corrected_micrographs_file->AddLine(wxString("data_optics"));
+                //relion_corrected_micrographs_file->AddLine(wxString(" "));
+                //relion_corrected_micrographs_file->AddLine(wxString("loop_"));
+                //relion_corrected_micrographs_file->AddLine(wxString("_rlnOpticsGroupName #1"));
+                //relion_corrected_micrographs_file->AddLine(wxString("_rlnOpticsGroup #2"));
+                //relion_corrected_micrographs_file->AddLine(wxString("_rlnMicrographOriginalPixelSize #3"));
+                //relion_corrected_micrographs_file->AddLine(wxString("_rlnVoltage #4"));
+                //relion_corrected_micrographs_file->AddLine(wxString("_rlnSphericalAberration #5"));
+                //relion_corrected_micrographs_file->AddLine(wxString("_rlnAmplitudeContrast #6"));
+                //relion_corrected_micrographs_file->AddLine(wxString("_rlnMicrographPixelSize #7"));
 
-                relion_corrected_micrographs_file->AddLine(wxString::Format("%s %i %f %f %f %f %f", "opticsGroup1", 1,
-                                                                            current_movie_asset->pixel_size,
-                                                                            first_particle.microscope_voltage,
-                                                                            first_particle.spherical_aberration,
-                                                                            first_particle.amplitude_contrast,
-                                                                            current_image_asset->pixel_size));
+                //relion_corrected_micrographs_file->AddLine(wxString::Format("%s %i %f %f %f %f %f", "opticsGroup1", 1,
+                //                                                            current_movie_asset->pixel_size,
+                //                                                            first_particle.microscope_voltage,
+                //                                                            first_particle.spherical_aberration,
+                //                                                            first_particle.amplitude_contrast,
+                //                                                            current_image_asset->pixel_size));
             }
 
             //write particle data block for either relion2 or relion3.1 format
@@ -336,7 +338,7 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
                 relion_star_file->AddLine(wxString("data_particles"));
                 relion_star_file->AddLine(wxString(" "));
                 relion_star_file->AddLine(wxString("loop_"));
-                relion_star_file->AddLine(wxString("_rlnMicrographName #1"));
+                //relion_star_file->AddLine(wxString("_rlnMicrographName #1"));
                 relion_star_file->AddLine(wxString("_rlnCoordinateX #2"));
                 relion_star_file->AddLine(wxString("_rlnCoordinateY #3"));
                 relion_star_file->AddLine(wxString("_rlnImageName #4"));
@@ -357,13 +359,13 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
                 relion_star_file->AddLine(wxString("_rlnOpticsGroup #19"));
                 relion_star_file->AddLine(wxString("_rlnRandomSubset #20"));
 
-                relion_corrected_micrographs_file->AddLine(wxString(" "));
-                relion_corrected_micrographs_file->AddLine(wxString("data_micrographs"));
-                relion_corrected_micrographs_file->AddLine(wxString(" "));
-                relion_corrected_micrographs_file->AddLine(wxString("loop_"));
-                relion_corrected_micrographs_file->AddLine(wxString("_rlnMicrographName #1"));
-                relion_corrected_micrographs_file->AddLine(wxString("_rlnMicrographMetadata #2"));
-                relion_corrected_micrographs_file->AddLine(wxString("_rlnOpticsGroup #3"));
+                //relion_corrected_micrographs_file->AddLine(wxString(" "));
+                //relion_corrected_micrographs_file->AddLine(wxString("data_micrographs"));
+                //relion_corrected_micrographs_file->AddLine(wxString(" "));
+                //relion_corrected_micrographs_file->AddLine(wxString("loop_"));
+                //relion_corrected_micrographs_file->AddLine(wxString("_rlnMicrographName #1"));
+                //relion_corrected_micrographs_file->AddLine(wxString("_rlnMicrographMetadata #2"));
+                //relion_corrected_micrographs_file->AddLine(wxString("_rlnOpticsGroup #3"));
             }
 
             OneSecondProgressDialog* my_dialog          = new OneSecondProgressDialog("Export To Relion", "Exporting...", current_package->contained_particles.GetCount( ), this);
@@ -373,7 +375,7 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
                 current_particle          = current_package->ReturnParticleInfoByPositionInStack(particle_counter + 1);
                 current_refinement_result = current_refinement->ReturnRefinementResultByClassAndPositionInStack(ClassComboBox->GetSelection( ), particle_counter + 1);
                 current_image_asset       = image_asset_panel->ReturnAssetPointer(image_asset_panel->ReturnArrayPositionFromAssetID(current_particle.parent_image_id));
-                current_movie_asset       = movie_asset_panel->ReturnAssetPointer(movie_asset_panel->ReturnArrayPositionFromAssetID(current_image_asset->parent_id));
+                //current_movie_asset       = movie_asset_panel->ReturnAssetPointer(movie_asset_panel->ReturnArrayPositionFromAssetID(current_image_asset->parent_id));
 
                 // Check whether we have already written out the motioncor results for the parent image asset. If not,
                 current_particle_is_first_from_this_image = (particle_counter == 0) || (array_of_unique_parent_image_asset_ids.Index(current_particle.parent_image_id, true) == wxNOT_FOUND);
@@ -390,16 +392,16 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
 
                 // if we have micrograph info, may as well include it..
 
-                if ( current_particle.parent_image_id >= 0 ) {
-                    micrograph_filename = image_asset_panel->ReturnAssetLongFilename(image_asset_panel->ReturnArrayPositionFromAssetID(current_particle.parent_image_id));
-                }
-                else {
-                    micrograph_filename = "unknown.mrc";
-                }
+                //if ( current_particle.parent_image_id >= 0 ) {
+                //    micrograph_filename = image_asset_panel->ReturnAssetLongFilename(image_asset_panel->ReturnArrayPositionFromAssetID(current_particle.parent_image_id));
+                //}
+                //else {
+                //    micrograph_filename = "unknown.mrc";
+                //}
 
                 //write particle data for either legacy relion format or relion3.1
                 if ( RelionRadioButton->GetValue( ) == true ) {
-                    relion_star_file->AddLine(wxString::Format("%s %f %f %06li@%s %f %f %f %f %f %f %f %f %f %f %f %f %f %f", micrograph_filename,
+                    relion_star_file->AddLine(wxString::Format(" %f %f %06li@%s %f %f %f %f %f %f %f %f %f %f %f %f %f %f", 
                                                                current_particle.x_pos / current_particle.pixel_size,
                                                                current_particle.y_pos / current_particle.pixel_size,
                                                                particle_counter + 1,
@@ -434,7 +436,7 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
                             random_subset = 2;
                         }
                     }
-                    relion_star_file->AddLine(wxString::Format("%s %f %f %06li@%s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %i %i", micrograph_filename,
+                    relion_star_file->AddLine(wxString::Format(" %f %f %06li@%s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %i %i",
                                                                current_particle.x_pos / current_particle.pixel_size,
                                                                current_particle.y_pos / current_particle.pixel_size,
                                                                particle_counter + 1,
@@ -456,110 +458,110 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
                                                                1,
                                                                random_subset));
 
-                    if ( current_particle_is_first_from_this_image ) {
-                        // We will need a star file to store results of motion correction
-                        relion_motioncor_star_current_filename.SetPath(relion_motioncor_star_base_filename.GetPath( ));
-                        relion_motioncor_star_current_filename.SetName(wxString::Format("%s_%06i.star", relion_motioncor_star_base_filename.GetName( ), current_image_asset->asset_id));
+                    //if ( current_particle_is_first_from_this_image ) {
+                    //    // We will need a star file to store results of motion correction
+                    //    relion_motioncor_star_current_filename.SetPath(relion_motioncor_star_base_filename.GetPath( ));
+                    //    relion_motioncor_star_current_filename.SetName(wxString::Format("%s_%06i.star", relion_motioncor_star_base_filename.GetName( ), current_image_asset->asset_id));
 
                         // Add this micrograph to the star file listing all micrographs
-                        relion_corrected_micrographs_file->AddLine(wxString::Format("%s %s %i", micrograph_filename.ToStdString( ), relion_motioncor_star_current_filename.GetFullPath( ), 1));
+                    //    relion_corrected_micrographs_file->AddLine(wxString::Format("%s %s %i", micrograph_filename.ToStdString( ), relion_motioncor_star_current_filename.GetFullPath( ), 1));
 
                         // Let's grab the motion correction job details from the database
-                        bool should_continue = main_frame->current_project.database.BeginBatchSelect(wxString::Format("SELECT PRE_EXPOSURE_AMOUNT,FIRST_FRAME_TO_SUM FROM MOVIE_ALIGNMENT_LIST WHERE MOVIE_ASSET_ID=%i AND ALIGNMENT_ID=%i", current_movie_asset->asset_id, current_image_asset->alignment_id));
-                        if ( ! should_continue ) {
-                            MyPrintWithDetails("Error getting information about movie alignment!");
-                            DEBUG_ABORT;
-                        }
-                        float pre_exposure_amount;
-                        int   first_frame_to_sum;
-                        main_frame->current_project.database.GetFromBatchSelect("si", &pre_exposure_amount, &first_frame_to_sum);
-                        main_frame->current_project.database.EndBatchSelect( );
+                    //    bool should_continue = main_frame->current_project.database.BeginBatchSelect(wxString::Format("SELECT PRE_EXPOSURE_AMOUNT,FIRST_FRAME_TO_SUM FROM MOVIE_ALIGNMENT_LIST WHERE MOVIE_ASSET_ID=%i AND ALIGNMENT_ID=%i", current_movie_asset->asset_id, current_image_asset->alignment_id));
+                    //    if ( ! should_continue ) {
+                    //        MyPrintWithDetails("Error getting information about movie alignment!");
+                    //        DEBUG_ABORT;
+                    //    }
+                    //    float pre_exposure_amount;
+                    //    int   first_frame_to_sum;
+                    //    main_frame->current_project.database.GetFromBatchSelect("si", &pre_exposure_amount, &first_frame_to_sum);
+                    //    main_frame->current_project.database.EndBatchSelect( );
 
                         /*
 					 * Write out a star file with the results of the whole-frame motion correction
 					 */
-                        relion_motioncor_star_current_file = new wxTextFile(relion_motioncor_star_current_filename.GetFullPath( ));
-                        if ( relion_motioncor_star_current_file->Exists( ) ) {
-                            relion_motioncor_star_current_file->Open( );
-                            relion_motioncor_star_current_file->Clear( );
-                        }
-                        else {
-                            relion_motioncor_star_current_file->Create( );
-                        }
+                      //  relion_motioncor_star_current_file = new wxTextFile(relion_motioncor_star_current_filename.GetFullPath( ));
+                     //   if ( relion_motioncor_star_current_file->Exists( ) ) {
+                     //       relion_motioncor_star_current_file->Open( );
+                     //       relion_motioncor_star_current_file->Clear( );
+                     //   }
+                     //   else {
+                     //       relion_motioncor_star_current_file->Create( );
+                     //   }
 
                         /*
 					 * Unfortunately Relion does not support reading .dm4 files. To make users' lives easier,
 					 * let's convert the gain ref from dm4 to mrc 
 					 */
-                        gain_ref_filename = current_movie_asset->gain_filename;
-                        if ( gain_ref_filename.GetExt( ) == "dm4" ) {
-                            gain_ref_filename.SetExt("mrc");
-                            gain_ref_filename.SetPath(output_stack_filename.GetPath( ));
+                      //  gain_ref_filename = current_movie_asset->gain_filename;
+                      //  if ( gain_ref_filename.GetExt( ) == "dm4" ) {
+                      //      gain_ref_filename.SetExt("mrc");
+                      //      gain_ref_filename.SetPath(output_stack_filename.GetPath( ));
 
-                            if ( ! wxFileExists(gain_ref_filename.GetFullPath( )) ) {
-                                ImageFile input_gain_ref_file(current_movie_asset->gain_filename.ToStdString( ), false);
-                                MRCFile   output_gain_ref_file(gain_ref_filename.GetFullPath( ).ToStdString( ), true);
-                                Image     gain_image;
-                                gain_image.ReadSlice(&input_gain_ref_file, 1);
-                                gain_image.WriteSlice(&output_gain_ref_file, 1);
-                            }
+                      //      if ( ! wxFileExists(gain_ref_filename.GetFullPath( )) ) {
+                       //         ImageFile input_gain_ref_file(current_movie_asset->gain_filename.ToStdString( ), false);
+                       //         MRCFile   output_gain_ref_file(gain_ref_filename.GetFullPath( ).ToStdString( ), true);
+                       //         Image     gain_image;
+                       //         gain_image.ReadSlice(&input_gain_ref_file, 1);
+                       //         gain_image.WriteSlice(&output_gain_ref_file, 1);
+                       //     }
                         }
 
                         // Start writing the star file
-                        relion_motioncor_star_current_file->AddLine(wxString(" "));
-                        relion_motioncor_star_current_file->AddLine(wxString("data_general"));
-                        relion_motioncor_star_current_file->AddLine(wxString(" "));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %i", "_rlnImageSizeX", current_movie_asset->x_size));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %i", "_rlnImageSizeY", current_movie_asset->y_size));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %i", "_rlnImageSizeZ", current_movie_asset->number_of_frames));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %s", "_rlnMicrographMovieName", current_movie_asset->filename.GetFullPath( )));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %s", "_rlnMicrographGainName", gain_ref_filename.GetFullPath( )));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %f", "_rlnMicrographBinning", current_movie_asset->output_binning_factor));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %f", "_rlnMicrographOriginalPixelSize", current_movie_asset->pixel_size));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %f", "_rlnMicrographDoseRate", current_movie_asset->dose_per_frame));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %f", "_rlnMicrographPreExposure", pre_exposure_amount));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %f", "_rlnMicrographVoltage", current_movie_asset->microscope_voltage));
-                        relion_motioncor_star_current_file->AddLine(wxString::Format("%s %i", "_rlnMicrographStartFrame", first_frame_to_sum));
+                        //relion_motioncor_star_current_file->AddLine(wxString(" "));
+                        //relion_motioncor_star_current_file->AddLine(wxString("data_general"));
+                        //relion_motioncor_star_current_file->AddLine(wxString(" "));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %i", "_rlnImageSizeX", current_movie_asset->x_size));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %i", "_rlnImageSizeY", current_movie_asset->y_size));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %i", "_rlnImageSizeZ", current_movie_asset->number_of_frames));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %s", "_rlnMicrographMovieName", current_movie_asset->filename.GetFullPath( )));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %s", "_rlnMicrographGainName", gain_ref_filename.GetFullPath( )));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %f", "_rlnMicrographBinning", current_movie_asset->output_binning_factor));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %f", "_rlnMicrographOriginalPixelSize", current_movie_asset->pixel_size));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %f", "_rlnMicrographDoseRate", current_movie_asset->dose_per_frame));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %f", "_rlnMicrographPreExposure", pre_exposure_amount));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %f", "_rlnMicrographVoltage", current_movie_asset->microscope_voltage));
+                        //relion_motioncor_star_current_file->AddLine(wxString::Format("%s %i", "_rlnMicrographStartFrame", first_frame_to_sum));
 
                         // Write out the section with the whole-frame shifts
-                        relion_motioncor_star_current_file->AddLine(wxString(" "));
-                        relion_motioncor_star_current_file->AddLine(wxString("data_global_shift"));
-                        relion_motioncor_star_current_file->AddLine(wxString(" "));
-                        relion_motioncor_star_current_file->AddLine(wxString("loop_"));
-                        relion_motioncor_star_current_file->AddLine(wxString("_rlnMicrographFrameNumber #1"));
-                        relion_motioncor_star_current_file->AddLine(wxString("_rlnMicrographShiftX #2"));
-                        relion_motioncor_star_current_file->AddLine(wxString("_rlnMicrographShiftY #3"));
+                        //relion_motioncor_star_current_file->AddLine(wxString(" "));
+                        //relion_motioncor_star_current_file->AddLine(wxString("data_global_shift"));
+                        //relion_motioncor_star_current_file->AddLine(wxString(" "));
+                        //relion_motioncor_star_current_file->AddLine(wxString("loop_"));
+                        //relion_motioncor_star_current_file->AddLine(wxString("_rlnMicrographFrameNumber #1"));
+                        //relion_motioncor_star_current_file->AddLine(wxString("_rlnMicrographShiftX #2"));
+                        //relion_motioncor_star_current_file->AddLine(wxString("_rlnMicrographShiftY #3"));
 
                         // Grab the actual alignment results from the database
-                        should_continue = main_frame->current_project.database.BeginBatchSelect(wxString::Format("SELECT * FROM MOVIE_ALIGNMENT_PARAMETERS_%i", current_image_asset->alignment_id));
-                        int   frame_counter;
-                        float current_x_shift;
-                        float current_y_shift;
-                        float first_x_shift;
-                        float first_y_shift;
-                        if ( ! should_continue ) {
-                            MyPrintWithDetails("Error getting alignment result!");
-                            DEBUG_ABORT;
-                        }
-                        while ( should_continue ) {
-                            should_continue = main_frame->current_project.database.GetFromBatchSelect("iss", &frame_counter, &current_x_shift, &current_y_shift);
-                            if ( frame_counter == 1 ) {
-                                first_x_shift = current_x_shift;
-                                first_y_shift = current_y_shift;
-                            }
+                        //should_continue = main_frame->current_project.database.BeginBatchSelect(wxString::Format("SELECT * FROM MOVIE_ALIGNMENT_PARAMETERS_%i", current_image_asset->alignment_id));
+                        //int   frame_counter;
+                        //float current_x_shift;
+                        //float current_y_shift;
+                        //float first_x_shift;
+                        //float first_y_shift;
+                        //if ( ! should_continue ) {
+                        //    MyPrintWithDetails("Error getting alignment result!");
+                        //    DEBUG_ABORT;
+                        //}
+                        //while ( should_continue ) {
+                        //    should_continue = main_frame->current_project.database.GetFromBatchSelect("iss", &frame_counter, &current_x_shift, &current_y_shift);
+                        //    if ( frame_counter == 1 ) {
+                        //        first_x_shift = current_x_shift;
+                        //        first_y_shift = current_y_shift;
+                        //    }
                             /* 
 						 * Relion expects shifts to be in pixels, but unblur returns them in Angstroms
 						 * Specifically, Relion expects them in the original input movie pixels before binning 
 						 * even with --early_binning. For EER, it depends on --eer_upsampling. If it is 2, 
 						 * it is 8K pixels (= 2x superresolution), if 1, it is 4K pixels (= hardware pixels)
 						 */
-                            relion_motioncor_star_current_file->AddLine(wxString::Format("%i %f %f", frame_counter, (current_x_shift - first_x_shift) / float(current_movie_asset->pixel_size), (current_y_shift - first_y_shift) / float(current_movie_asset->pixel_size)));
-                        }
-                        main_frame->current_project.database.EndBatchSelect( );
+                        //    relion_motioncor_star_current_file->AddLine(wxString::Format("%i %f %f", frame_counter, (current_x_shift - first_x_shift) / float(current_movie_asset->pixel_size), (current_y_shift - first_y_shift) / float(current_movie_asset->pixel_size)));
+                        //}
+                        //main_frame->current_project.database.EndBatchSelect( );
 
-                        relion_motioncor_star_current_file->Write( );
-                        relion_motioncor_star_current_file->Close( );
-                        delete relion_motioncor_star_current_file;
+                        //relion_motioncor_star_current_file->Write( );
+                        //relion_motioncor_star_current_file->Close( );
+                        //delete relion_motioncor_star_current_file;
                     } // first particle from this image
 
                 } // relion3
@@ -570,8 +572,8 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
             relion_star_file->Write( );
             relion_star_file->Close( );
 
-            relion_corrected_micrographs_file->Write( );
-            relion_corrected_micrographs_file->Close( );
+            //relion_corrected_micrographs_file->Write( );
+            //relion_corrected_micrographs_file->Close( );
 
             input_stack.CloseFile( );
             output_stack.CloseFile( );
@@ -579,7 +581,7 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
             delete relion_star_file;
             delete current_refinement;
 
-            delete relion_corrected_micrographs_file;
+            //delete relion_corrected_micrographs_file;
 
             my_dialog->Destroy( );
         }
