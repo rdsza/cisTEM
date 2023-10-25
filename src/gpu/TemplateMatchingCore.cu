@@ -209,7 +209,7 @@ void TemplateMatchingCore::RunInnerLoop(Image& projection_filter, float c_pixel,
             //			d_padded_reference.BackwardFFTAfterComplexConjMul(d_input_image.complex_values_gpu, false);
             //			d_padded_reference.ConvertToHalfPrecision(false);
             // RD: write out cc's
-            d_padded_reference.QuickAndDirtyWriteSlice(wxString::Format("%i_psi_%f_cc.mrc",current_search_position,current_psi).ToStdString(), 1);
+            //d_padded_reference.QuickAndDirtyWriteSlice(wxString::Format("%i_psi_%f_cc.mrc",current_search_position,current_psi).ToStdString(), 1);
 
             if ( DO_HISTOGRAM ) {
                 if ( ! histogram.is_allocated_histogram ) {

@@ -276,7 +276,7 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
                 first_particle = current_package->ReturnParticleInfoByPositionInStack(1);
                 MyDebugAssertTrue(first_particle.parent_image_id >= 0, "Oops. Invalid parent image ID for the first particle");
                 current_image_asset = image_asset_panel->ReturnAssetPointer(image_asset_panel->ReturnArrayPositionFromAssetID(first_particle.parent_image_id));
-                current_movie_asset = movie_asset_panel->ReturnAssetPointer(movie_asset_panel->ReturnArrayPositionFromAssetID(current_image_asset->parent_id));
+                //current_movie_asset = movie_asset_panel->ReturnAssetPointer(movie_asset_panel->ReturnArrayPositionFromAssetID(current_image_asset->parent_id));
 
                 relion_star_file->AddLine(wxString::Format("%i %s %f %f %f %f %i %i", 1,
                                                            "opticsGroup1",
@@ -562,9 +562,9 @@ void ExportRefinementPackageWizard::OnFinished(wxWizardEvent& event) {
                         //relion_motioncor_star_current_file->Write( );
                         //relion_motioncor_star_current_file->Close( );
                         //delete relion_motioncor_star_current_file;
-                    } // first particle from this image
+                    //} // first particle from this image
 
-                } // relion3
+                //} // relion3
 
                 my_dialog->Update(particle_counter + 1);
             } // loop over particles
