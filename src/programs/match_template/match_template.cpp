@@ -801,9 +801,10 @@ bool MatchTemplateApp::DoCalculation( ) {
 
                 //current_rotation = 0;
                 // Maybe dynamically allocate an object here to hold trimmed values for sorting & winsor mean, std_Dev
-                double* winsor_mean_trimmed = new double[input_image.real_memory_allocated];
+                //double* winsor_mean_trimmed = new double[input_image.real_memory_allocated];
                 //double* winsor_std_trimmed = new double[input_image.real_memory_allocated];
-                Allocate2DFloatArray(winsor_mean_trimmed, input_image.real_memory_allocated, 100);
+                float** winsor_mean_trimmed;
+                Allocate2DFloatArray(winsor_mean_trimmed, input_image.real_memory_allocated,100);
                 //Allocate2DFloatArray(winsor_std_trimmed, input_image.real_memory_allocated, 100);
                 for ( current_psi = psi_start; current_psi <= psi_max; current_psi += psi_step ) {
 
