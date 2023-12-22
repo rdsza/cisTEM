@@ -800,6 +800,11 @@ bool MatchTemplateApp::DoCalculation( ) {
                 //loop over each rotation angle
 
                 //current_rotation = 0;
+                // Maybe dynamically allocate an object here to hold trimmed values for sorting & winsor mean, std_Dev
+                double* winsor_mean_trimmed = new double[input_image.real_memory_allocated];
+                //double* winsor_std_trimmed = new double[input_image.real_memory_allocated];
+                Allocate2DFloatArray(winsor_mean_trimmed, input_image.real_memory_allocated, 100);
+                //Allocate2DFloatArray(winsor_std_trimmed, input_image.real_memory_allocated, 100);
                 for ( current_psi = psi_start; current_psi <= psi_max; current_psi += psi_step ) {
 
                     angles.Init(global_euler_search.list_of_search_parameters[current_search_position][0], global_euler_search.list_of_search_parameters[current_search_position][1], current_psi, 0.0, 0.0);
@@ -882,8 +887,20 @@ bool MatchTemplateApp::DoCalculation( ) {
                     }
                     // RD winsor_statistics
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
-                        winsor_mean[pixel_counter] = winsorize_mean(padded_reference.real_values[pixel_counter]);
-                        winsor_std[pixel_counter] = winsorize_std_dev(padded_reference.real_values[pixel_counter]);
+                        // Take the column values for a given pixel and make a new vector to be passed into the winsorize function
+                        // Create a std::vector<double> to hold the values from the selected column
+                        std::vector<double> current_trimmed_values;
+
+                        // Iterate through the rows and copy values from the selected column
+                        for (int col = 0; col < 100; ++col) {
+                            current_trimmed_values.push_back(static_cast<double>(floatArray[pixel_counter][col]));
+                        }
+                        // Add the new value to the vector
+                        winsor_mean_trimmed.push_back(padded_reference.real_values[pixel_counter]);
+                        winsor_mean[pixel_counter] = winsorize_mean(current_trimmed_values);
+                        winsor_std[pixel_counter] = winsorize_std_dev(current_trimmed_values);
+
+                        // Update the trimmed values for the same pixel
                     }
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
@@ -913,6 +930,9 @@ bool MatchTemplateApp::DoCalculation( ) {
                         AddJobToResultQueue(temp_result);
                     }
                 }
+                // Delete the winsor objects here.
+                delete[] winsor_mean_trimmed;
+                //delete[] winsor_std_trimmed;
             }
         }
     }
@@ -965,8 +985,8 @@ bool MatchTemplateApp::DoCalculation( ) {
         for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
             correlation_pixel_sum[pixel_counter]            = (double)correlation_pixel_sum_image.real_values[pixel_counter];
             correlation_pixel_sum_of_squares[pixel_counter] = (double)correlation_pixel_sum_of_squares_image.real_values[pixel_counter];
-            winsor_mean_image[pixel_counter]                = (double)winsor_mean_image.real_values[pixel_counter];
-            winsor_std_image[pixel_counter]                 = (double)winsor_std_image.real_values[pixel_counter];
+            winsor_mean[pixel_counter]                = (double)winsor_mean_image.real_values[pixel_counter];
+            winsor_std[pixel_counter]                 = (double)winsor_std_image.real_values[pixel_counter];
         }
     }
 

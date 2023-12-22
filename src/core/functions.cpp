@@ -1419,12 +1419,47 @@ bool StripEnclosingSingleQuotesFromString(wxString& string_to_strip) {
         return false;
 }
 
-double winsorize_mean(double x) {
-    return x;
+double winsorize_mean(const std::vector<double>& values) {
+    // Calculate the number of elements to trim from each tail
+    size_t lower_trim_count = static_cast<size_t>((lower_trim_percentage / 100.0) * values.size());
+    size_t upper_trim_count = static_cast<size_t>((upper_trim_percentage / 100.0) * values.size());
+    
+    // Create a sorted copy of the values
+    std::vector<double> sorted_values = values;
+    std::sort(sorted_values.begin(), sorted_values.end());
+    
+    // Trim elements from both tails
+    sorted_values.erase(sorted_values.begin(), sorted_values.begin() + lower_trim_count);
+    sorted_values.erase(sorted_values.end() - upper_trim_count, sorted_values.end());
+    
+    // Calculate and return the Windsor estimator
+    double sum = 0.0;
+    for (double val : sorted_values) {
+        sum += val;
+    }
+    return sum / sorted_values.size();
 }
 
-double winsorize_std_dev(double x) {
-    return x/2;
+double winsorize_std_dev(const std::vector<double>& values) {
+    // Calculate the Windsor estimator using the values
+    double winsorized_mean = winsorize_mean(values);
+    
+    // Calculate the squared differences from the estimator
+    std::vector<double> squared_diff;
+    for (double val : values) {
+        double diff = val - winsorized_mean;
+        squared_diff.push_back(diff * diff);
+    }
+    
+    // Calculate the mean of squared differences
+    double sum_of_squared_diff = 0.0;
+    for (double diff : squared_diff) {
+        sum_of_squared_diff += diff;
+    }
+    double mean_squared_diff = sum_of_squared_diff / squared_diff.size();
+    
+    // Calculate the Winsorized standard deviation
+    return std::sqrt(mean_squared_diff);
 }
 
 ///////////////////////////// CPU CHECK /////////////////
