@@ -1419,6 +1419,14 @@ bool StripEnclosingSingleQuotesFromString(wxString& string_to_strip) {
         return false;
 }
 
+double winsorize_mean(double x) {
+    return x;
+}
+
+double winsorize_std_dev(double x) {
+    return x/2;
+}
+
 ///////////////////////////// CPU CHECK /////////////////
 
 //  The intel MKL is hobbled on AMD processors, the purpose of this section of code is to detect if we are running on an AMD processor that can

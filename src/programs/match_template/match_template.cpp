@@ -79,6 +79,8 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     wxString output_histogram_file;
     wxString correlation_std_output_file;
     wxString correlation_avg_output_file;
+    wxString winsor_avg_output_file;
+    wxString winsor_std_output_file;
     wxString scaled_mip_output_file;
 
     float pixel_size              = 1.0f;
@@ -145,6 +147,8 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
 #endif
+    winsor_avg_output_file      = my_input->GetFilenameFromUser("Correlation winsor average value file ", "The file for saving the winsor average of all the correlation images", "corr_winsor_avg.mrc", false);
+    winsor_std_output_file      = my_input->GetFilenameFromUser("Correlation winsor std deviation value file ", "The file for saving the winsor std deviation of all the correlation images", "corr_winsor_std.mrc", false);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -157,7 +161,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 
     delete my_input;
 
-    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbi", input_search_images.ToUTF8( ).data( ),
+    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbitt", input_search_images.ToUTF8( ).data( ),
                                       input_reconstruction.ToUTF8( ).data( ),
                                       pixel_size,
                                       voltage_kV,
@@ -198,7 +202,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads);
+                                      max_threads,winsor_avg_output_file.ToUTF8( ).data(), winsor_std_output_file.ToUTF8( ).data());
 }
 
 // override the do calculation method which will be what is actually run..
@@ -256,6 +260,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     float    min_peak_radius                 = my_current_job.arguments[39].ReturnFloatArgument( );
     bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
+    wxString winsor_avg_output_file          = my_current_job.arguments[42].ReturnStringArgument( );
+    wxString winsor_std_output_file          = my_current_job.arguments[43].ReturnStringArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -357,6 +363,9 @@ bool MatchTemplateApp::DoCalculation( ) {
     Image correlation_pixel_sum_image;
     Image correlation_pixel_sum_of_squares_image;
 
+    Image winsor_mean_image;
+    Image winsor_std_image;
+
     Image temp_image;
 
     input_image.ReadSlice(&input_search_image_file, 1);
@@ -457,8 +466,12 @@ bool MatchTemplateApp::DoCalculation( ) {
     best_pixel_size.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     correlation_pixel_sum_image.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     correlation_pixel_sum_of_squares_image.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
+    winsor_mean_image.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
+    winsor_std_image.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     double* correlation_pixel_sum            = new double[input_image.real_memory_allocated];
     double* correlation_pixel_sum_of_squares = new double[input_image.real_memory_allocated];
+    double* winsor_mean = new double[input_image.real_memory_allocated];
+    double* winsor_std = new double[input_image.real_memory_allocated];
 
     padded_reference.SetToConstant(0.0f);
     max_intensity_projection.SetToConstant(-FLT_MAX);
@@ -469,6 +482,9 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     ZeroDoubleArray(correlation_pixel_sum, input_image.real_memory_allocated);
     ZeroDoubleArray(correlation_pixel_sum_of_squares, input_image.real_memory_allocated);
+
+    ZeroDoubleArray(winsor_mean, input_image.real_memory_allocated);
+    ZeroDoubleArray(winsor_std, input_image.real_memory_allocated);
 
     sqrt_input_pixels = sqrt((double)(input_image.logical_x_dimension * input_image.logical_y_dimension));
 
@@ -864,7 +880,11 @@ bool MatchTemplateApp::DoCalculation( ) {
 
                         pixel_counter += padded_reference.padding_jump_value;
                     }
-
+                    // RD winsor_statistics
+                    for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
+                        winsor_mean[pixel_counter] = winsorize_mean(padded_reference.real_values[pixel_counter])
+                        winsor_std[pixel_counter] = winsorize_std_dev(padded_reference.real_values[pixel_counter])
+                    }
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
                         correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
@@ -874,6 +894,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
                         correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter];
                     }
+                    
 
                     //max_intensity_projection.QuickAndDirtyWriteSlice("/tmp/mip.mrc", 1);
 
@@ -897,6 +918,11 @@ bool MatchTemplateApp::DoCalculation( ) {
     }
 
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
+
+    for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++) {
+        winsor_mean_image.real_values[pixel_counter] = (float)winsor_mean[pixel_counter];
+        winsor_std_image.real_values[pixel_counter] = (float)winsor_std[pixel_counter];
+    }
 
     for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
         correlation_pixel_sum_image.real_values[pixel_counter]            = (float)correlation_pixel_sum[pixel_counter];
@@ -925,6 +951,9 @@ bool MatchTemplateApp::DoCalculation( ) {
         correlation_pixel_sum_image.RotateInPlaceAboutZBy90Degrees(false);
         correlation_pixel_sum_of_squares_image.RotateInPlaceAboutZBy90Degrees(false);
 
+        winsor_mean_image.RotateInPlaceAboutZBy90Degrees(false);
+        winsor_std_image.RotateInPlaceAboutZBy90Degrees(false);
+
         // This is ineffecient, but a quick way to ensure consistent results.
         delete[] correlation_pixel_sum;
         delete[] correlation_pixel_sum_of_squares;
@@ -936,6 +965,8 @@ bool MatchTemplateApp::DoCalculation( ) {
         for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
             correlation_pixel_sum[pixel_counter]            = (double)correlation_pixel_sum_image.real_values[pixel_counter];
             correlation_pixel_sum_of_squares[pixel_counter] = (double)correlation_pixel_sum_of_squares_image.real_values[pixel_counter];
+            winsor_mean_image[pixel_counter]                = (double)winsor_mean_image.real_values[pixel_counter];
+            winsor_std_image[pixel_counter]                 = (double)winsor_std_image.real_values[pixel_counter];
         }
     }
 
@@ -1021,11 +1052,17 @@ bool MatchTemplateApp::DoCalculation( ) {
                 max_intensity_projection.real_values[pixel_counter] = 0.0f;
             correlation_pixel_sum_image.real_values[pixel_counter]            = correlation_pixel_sum[pixel_counter];
             correlation_pixel_sum_of_squares_image.real_values[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter];
+            winsor_mean_image.real_values[pixel_counter]                      = winsor_mean[pixel_counter];
+            winsor_std_image.real_values[pixel_counter]                       = winsor_std[pixel_counter];
         }
         //        max_intensity_projection.DividePixelWise(correlation_pixel_sum_of_squares);
         max_intensity_projection.Resize(original_input_image_x, original_input_image_y, 1, max_intensity_projection.ReturnAverageOfRealValuesOnEdges( ));
         max_intensity_projection.QuickAndDirtyWriteSlice(scaled_mip_output_file.ToStdString( ), 1, pixel_size);
 
+        winsor_mean_image.Resize(original_input_image_x, original_input_image_y, 1, winsor_mean_image.ReturnAverageOfRealValuesOnEdges( ))
+        winsor_mean_image.QuickAndDirtyWriteSlice(winsor_avg_output_file.ToStdString( ), 1, pixel_size);
+        winsor_std_image.Resize(original_input_image_x, original_input_image_y, 1, winsor_std_image.ReturnAverageOfRealValuesOnEdges( ))
+        winsor_std_image.QuickAndDirtyWriteSlice(winsor_std_output_file.ToStdString( ), 1, pixel_size);
         correlation_pixel_sum_image.Resize(original_input_image_x, original_input_image_y, 1, correlation_pixel_sum_image.ReturnAverageOfRealValuesOnEdges( ));
         correlation_pixel_sum_image.QuickAndDirtyWriteSlice(correlation_avg_output_file.ToStdString( ), 1, pixel_size);
         correlation_pixel_sum_of_squares_image.Resize(original_input_image_x, original_input_image_y, 1, correlation_pixel_sum_of_squares_image.ReturnAverageOfRealValuesOnEdges( ));
@@ -1627,7 +1664,6 @@ void MatchTemplateApp::MasterHandleProgramDefinedResult(float* result_array, lon
                     sq_dist_x = float(i) - current_peak.x;
                     sq_dist_x *= sq_dist_x;
                     address = phi_image.ReturnReal1DAddressFromPhysicalCoord(i, j, 0);
-
                     // The square centered at the pixel
                     if ( sq_dist_x == 0 && sq_dist_y == 0 ) {
                         current_phi   = phi_image.real_values[address];
