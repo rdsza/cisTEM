@@ -893,10 +893,10 @@ bool MatchTemplateApp::DoCalculation( ) {
 
                         // Iterate through the rows and copy values from the selected column
                         for (int col = 0; col < 100; ++col) {
-                            current_trimmed_values.push_back(static_cast<double>(floatArray[pixel_counter][col]));
+                            current_trimmed_values.push_back(static_cast<double>(winsor_mean_trimmed[pixel_counter][col]));
                         }
                         // Add the new value to the vector
-                        winsor_mean_trimmed.push_back(padded_reference.real_values[pixel_counter]);
+                        current_trimmed_values.push_back(padded_reference.real_values[pixel_counter]);
                         winsor_mean[pixel_counter] = winsorize_mean(current_trimmed_values);
                         winsor_std[pixel_counter] = winsorize_std_dev(current_trimmed_values);
 
