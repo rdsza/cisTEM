@@ -882,8 +882,8 @@ bool MatchTemplateApp::DoCalculation( ) {
                     }
                     // RD winsor_statistics
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
-                        winsor_mean[pixel_counter] = winsorize_mean(padded_reference.real_values[pixel_counter])
-                        winsor_std[pixel_counter] = winsorize_std_dev(padded_reference.real_values[pixel_counter])
+                        winsor_mean[pixel_counter] = winsorize_mean(padded_reference.real_values[pixel_counter]);
+                        winsor_std[pixel_counter] = winsorize_std_dev(padded_reference.real_values[pixel_counter]);
                     }
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
@@ -1059,9 +1059,9 @@ bool MatchTemplateApp::DoCalculation( ) {
         max_intensity_projection.Resize(original_input_image_x, original_input_image_y, 1, max_intensity_projection.ReturnAverageOfRealValuesOnEdges( ));
         max_intensity_projection.QuickAndDirtyWriteSlice(scaled_mip_output_file.ToStdString( ), 1, pixel_size);
 
-        winsor_mean_image.Resize(original_input_image_x, original_input_image_y, 1, winsor_mean_image.ReturnAverageOfRealValuesOnEdges( ))
+        winsor_mean_image.Resize(original_input_image_x, original_input_image_y, 1, winsor_mean_image.ReturnAverageOfRealValuesOnEdges( ));
         winsor_mean_image.QuickAndDirtyWriteSlice(winsor_avg_output_file.ToStdString( ), 1, pixel_size);
-        winsor_std_image.Resize(original_input_image_x, original_input_image_y, 1, winsor_std_image.ReturnAverageOfRealValuesOnEdges( ))
+        winsor_std_image.Resize(original_input_image_x, original_input_image_y, 1, winsor_std_image.ReturnAverageOfRealValuesOnEdges( ));
         winsor_std_image.QuickAndDirtyWriteSlice(winsor_std_output_file.ToStdString( ), 1, pixel_size);
         correlation_pixel_sum_image.Resize(original_input_image_x, original_input_image_y, 1, correlation_pixel_sum_image.ReturnAverageOfRealValuesOnEdges( ));
         correlation_pixel_sum_image.QuickAndDirtyWriteSlice(correlation_avg_output_file.ToStdString( ), 1, pixel_size);
