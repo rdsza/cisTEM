@@ -894,7 +894,9 @@ bool MatchTemplateApp::DoCalculation( ) {
 
                         // Iterate through the rows and copy values from the selected column
                         for (int col = 0; col < 100; ++col) {
-                            current_trimmed_values.push_back(double(winsor_mean_trimmed[pixel_counter][col]));
+                            float floatValue = winsor_mean_trimmed[pixel_counter][col];
+                            double doubleValue = static_cast<double>(floatValue);
+                            current_trimmed_values.push_back(doubleValue);
                         }
                         // Add the new value to the vector
                         current_trimmed_values.push_back(padded_reference.real_values[pixel_counter]);
