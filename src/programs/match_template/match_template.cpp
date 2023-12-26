@@ -909,7 +909,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                             updated_Trim.push_back(trimmed_vec[pixel_counter][j]);
                             }
                         // Calculate trimmed Vaues
-                        std::vector<double> trimmedValues = calculateTrimmedValues(, lowerTrim, upperTrim);
+                        std::vector<double> trimmedValues = calculateTrimmedValues(updated_Trim, lowerTrim, upperTrim);
                         // Calculate Winsor mean
                         winsor_mean[pixel_counter] = calculateWinsorMean(trimmedValues);
                         //Calculate Standard Deviation
