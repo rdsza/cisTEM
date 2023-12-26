@@ -903,8 +903,13 @@ bool MatchTemplateApp::DoCalculation( ) {
                                 break; // Stop after the first '0.0' is replaced
                                 }
                                 }
+                        // Initialize a vector to store the values from the row
+                        std::vector<float> updated_Trim;
+                        for (int j = 0; j < second_dim; ++j) {
+                            updated_Trim.push_back(trimmed_vec[pixel_counter][j]);
+                            }
                         // Calculate trimmed Vaues
-                        std::vector<double> trimmedValues = calculateTrimmedValues(current_trimmed_values, lowerTrim, upperTrim);
+                        std::vector<double> trimmedValues = calculateTrimmedValues(, lowerTrim, upperTrim);
                         // Calculate Winsor mean
                         winsor_mean[pixel_counter] = calculateWinsorMean(trimmedValues);
                         //Calculate Standard Deviation
