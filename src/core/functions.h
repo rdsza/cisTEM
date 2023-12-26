@@ -444,9 +444,9 @@ int ReturnThreadNumberOfCurrentThread( );
 double cisTEM_erfinv(double x);
 double cisTEM_erfcinv(double x);
 
-double calculateWinsorMean(const std::vector<double>& trimmedValues)
-double calculateStdDev(const std::vector<double>& trimmedValues, double mean) 
-std::vector<double> calculateTrimmedValues(const std::vector<double>& input, double lowerTrim, double upperTrim)
+double calculateWinsorMean(const std::vector<double>& trimmedValues);
+double calculateStdDev(const std::vector<double>& trimmedValues, double mean);
+std::vector<double> calculateTrimmedValues(const std::vector<double>& input, double lowerTrim, double upperTrim);
 
 bool StripEnclosingSingleQuotesFromString(wxString& string_to_strip); // returns true if it was done, false if first and last characters are not '
 

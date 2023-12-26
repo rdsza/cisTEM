@@ -1458,7 +1458,7 @@ std::vector<double> calculateTrimmedValues(const std::vector<double>& input, dou
     }
 
     return trimmedValues;
-
+}
 ///////////////////////////// CPU CHECK /////////////////
 
 //  The intel MKL is hobbled on AMD processors, the purpose of this section of code is to detect if we are running on an AMD processor that can

@@ -908,7 +908,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         // Calculate Winsor mean
                         winsor_mean[pixel_counter] = calculateWinsorMean(trimmedValues);
                         //Calculate Standard Deviation
-                        winsor_std[pixel_counter] = calculateStdDev(trimmedValues, winsor_mean_trimmed[pixel_counter]);
+                        winsor_std[pixel_counter] = calculateStdDev(trimmedValues, winsor_mean[pixel_counter]);
                         // Update the 2D array with Output trimmed vector
                         for (int j = 0; j <= second_dim ; ++j) {
                             if (j < trimmedValues.size()) {
