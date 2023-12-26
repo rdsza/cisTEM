@@ -333,6 +333,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     int    remove_npix_from_edge = 0;
     double sqrt_input_pixels;
 
+    int number_of_search_positions = 0;
+
     EulerSearch     global_euler_search;
     AnglesAndShifts angles;
 
