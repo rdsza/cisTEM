@@ -903,12 +903,6 @@ bool MatchTemplateApp::DoCalculation( ) {
                                 break; // Stop after the first '0.0' is replaced
                                 }
                                 }
-                        // Check if the specified row and column are within bounds
-                        if (j >= 0 && j < numCols) {
-                            trimmed_vec[pixel_counter][j] = valueToAppend;
-                            } else {
-                                std::cout << "Invalid row or column index." << std::endl;
-                                }
                         // Calculate trimmed Vaues
                         std::vector<double> trimmedValues = calculateTrimmedValues(current_trimmed_values, lowerTrim, upperTrim);
                         // Calculate Winsor mean
