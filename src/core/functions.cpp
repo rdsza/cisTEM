@@ -1419,48 +1419,45 @@ bool StripEnclosingSingleQuotesFromString(wxString& string_to_strip) {
         return false;
 }
 
-double winsorize_mean(const std::vector<double>& values) {
-    // Calculate the number of elements to trim from each tail
-    size_t lower_trim_count = static_cast<size_t>((lower_trim_percentage / 100.0) * values.size());
-    size_t upper_trim_count = static_cast<size_t>((upper_trim_percentage / 100.0) * values.size());
-    
-    // Create a sorted copy of the values
-    std::vector<double> sorted_values = values;
-    std::sort(sorted_values.begin(), sorted_values.end());
-    
-    // Trim elements from both tails
-    sorted_values.erase(sorted_values.begin(), sorted_values.begin() + lower_trim_count);
-    sorted_values.erase(sorted_values.end() - upper_trim_count, sorted_values.end());
-    
-    // Calculate and return the Windsor estimator
+// Function to calculate the Winsor mean
+double calculateWinsorMean(const std::vector<double>& trimmedValues) {
     double sum = 0.0;
-    for (double val : sorted_values) {
-        sum += val;
+    for (double value : trimmedValues) {
+        sum += value;
     }
-    return sum / sorted_values.size();
+    return sum / trimmedValues.size();
 }
 
-double winsorize_std_dev(const std::vector<double>& values) {
-    // Calculate the Windsor estimator using the values
-    double winsorized_mean = winsorize_mean(values);
-    
-    // Calculate the squared differences from the estimator
-    std::vector<double> squared_diff;
-    for (double val : values) {
-        double diff = val - winsorized_mean;
-        squared_diff.push_back(diff * diff);
+// Function to calculate the standard deviation
+double calculateStdDev(const std::vector<double>& trimmedValues, double mean) {
+    double sumSquaredDiff = 0.0;
+    for (double value : trimmedValues) {
+        double diff = value - mean;
+        sumSquaredDiff += diff * diff;
     }
-    
-    // Calculate the mean of squared differences
-    double sum_of_squared_diff = 0.0;
-    for (double diff : squared_diff) {
-        sum_of_squared_diff += diff;
-    }
-    double mean_squared_diff = sum_of_squared_diff / squared_diff.size();
-    
-    // Calculate the Winsorized standard deviation
-    return std::sqrt(mean_squared_diff);
+    return std::sqrt(sumSquaredDiff / trimmedValues.size());
 }
+
+// Function to calculate the trimmed values
+std::vector<double> calculateTrimmedValues(const std::vector<double>& input, double lowerTrim, double upperTrim) {
+    std::vector<double> trimmedValues;
+
+    // Calculate the lower and upper trimming bounds
+    double lowerBound = lowerTrim * (input.size() - 1);
+    double upperBound = upperTrim * (input.size() - 1);
+
+    // Sort the input array
+    std::vector<double> sortedInput = input;
+    std::sort(sortedInput.begin(), sortedInput.end());
+
+    // Trim the values
+    for (int i = 0; i < input.size(); ++i) {
+        if (i >= lowerBound && i <= upperBound) {
+            trimmedValues.push_back(sortedInput[i]);
+        }
+    }
+
+    return trimmedValues;
 
 ///////////////////////////// CPU CHECK /////////////////
 

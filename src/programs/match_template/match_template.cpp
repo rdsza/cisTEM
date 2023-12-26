@@ -796,16 +796,17 @@ bool MatchTemplateApp::DoCalculation( ) {
 #endif
             }
 
+            float** trimmed_vec;
+            int second_dim = 50;
+            Allocate2DFloatArray(trimmed_vec, input_image.real_memory_allocated, second_dim);
+            // RD 
+            // For winsor statistics
+            // Set the values for the trim bounds
+            double lowerTrim = 0.1;
+            double upperTrim = 0.1;
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
-
-                //current_rotation = 0;
-                // Maybe dynamically allocate an object here to hold trimmed values for sorting & winsor mean, std_Dev
-                //double* winsor_mean_trimmed = new double[input_image.real_memory_allocated];
-                //double* winsor_std_trimmed = new double[input_image.real_memory_allocated];
-                float** winsor_mean_trimmed;
-                Allocate2DFloatArray(winsor_mean_trimmed, input_image.real_memory_allocated,100);
-                //Allocate2DFloatArray(winsor_std_trimmed, input_image.real_memory_allocated, 100);
+                
                 for ( current_psi = psi_start; current_psi <= psi_max; current_psi += psi_step ) {
 
                     angles.Init(global_euler_search.list_of_search_parameters[current_search_position][0], global_euler_search.list_of_search_parameters[current_search_position][1], current_psi, 0.0, 0.0);
@@ -888,22 +889,40 @@ bool MatchTemplateApp::DoCalculation( ) {
                     }
                     // RD winsor_statistics
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
+
                         // Take the column values for a given pixel and make a new vector to be passed into the winsorize function
-                        // Create a std::vector<double> to hold the values from the selected column
-                        std::vector<double> current_trimmed_values;
-
-                        // Iterate through the rows and copy values from the selected column
-                        for (int col = 0; col < 100; ++col) {
-                            float floatValue = winsor_mean_trimmed[pixel_counter][col];
-                            double doubleValue = static_cast<double>(floatValue);
-                            current_trimmed_values.push_back(doubleValue);
-                        }
+                        
                         // Add the new value to the vector
-                        current_trimmed_values.push_back(padded_reference.real_values[pixel_counter]);
-                        winsor_mean[pixel_counter] = winsorize_mean(current_trimmed_values);
-                        winsor_std[pixel_counter] = winsorize_std_dev(current_trimmed_values);
-
-                        // Update the trimmed values for the same pixel
+                        float valueToAppend = padded_reference.real_values[pixel_counter];
+                        // Find the first '0.0' and replace it with the new value (if found)
+                        bool replaced = false;
+                        for (int j = 0; j < second_dim; ++j) {
+                            if (trimmed_vec[pixel_counter][j] == 0.0) {
+                                trimmed_vec[pixel_counter][j] = valueToAppend;
+                                replaced = true;
+                                break; // Stop after the first '0.0' is replaced
+                                }
+                                }
+                        // Check if the specified row and column are within bounds
+                        if (j >= 0 && j < numCols) {
+                            trimmed_vec[pixel_counter][j] = valueToAppend;
+                            } else {
+                                std::cout << "Invalid row or column index." << std::endl;
+                                }
+                        // Calculate trimmed Vaues
+                        std::vector<double> trimmedValues = calculateTrimmedValues(current_trimmed_values, lowerTrim, upperTrim);
+                        // Calculate Winsor mean
+                        winsor_mean_trimmed[pixel_counter] = calculateWinsorMean(trimmedValues);
+                        //Calculate Standard Deviation
+                        winsor_std_trimmed[pixel_counter] = calculateStdDev(trimmedValues, winsor_mean_trimmed[pixel_counter]);
+                        // Update the 2D array with Output trimmed vector
+                        for (int j = 0; j <= second_dim ; ++j) {
+                            if (j < trimmedValues.size()) {
+                                trimmed_vec[pixel_counter][i] = (float)trimmedValues[i];
+                            } else {
+                                trimmed_vec[pixel_counter][i] = 0.0f;
+                            }
+                            }
                     }
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
@@ -933,9 +952,8 @@ bool MatchTemplateApp::DoCalculation( ) {
                         AddJobToResultQueue(temp_result);
                     }
                 }
-                // Delete the winsor objects here.
-                delete[] winsor_mean_trimmed;
-                //delete[] winsor_std_trimmed;
+                // Delete the winsor trimmed vector here.
+                //delete[] trimmed_vec;
             }
         }
     }
