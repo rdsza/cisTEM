@@ -802,8 +802,8 @@ bool MatchTemplateApp::DoCalculation( ) {
             // RD 
             // For winsor statistics
             // Set the values for the trim bounds
-            double lowerTrim = 0.1;
-            double upperTrim = 0.1;
+            float lowerTrim = 0.1;
+            float upperTrim = 0.1;
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
                 
@@ -909,7 +909,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                             updated_Trim.push_back(trimmed_vec[pixel_counter][j]);
                             }
                         // Calculate trimmed Vaues
-                        std::vector<double> trimmedValues = calculateTrimmedValues(updated_Trim, lowerTrim, upperTrim);
+                        std::vector<float> trimmedValues = calculateTrimmedValues(updated_Trim, lowerTrim, upperTrim);
                         // Calculate Winsor mean
                         winsor_mean[pixel_counter] = calculateWinsorMean(trimmedValues);
                         //Calculate Standard Deviation
@@ -917,7 +917,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         // Update the 2D array with Output trimmed vector
                         for (int j = 0; j <= second_dim ; ++j) {
                             if (j < trimmedValues.size()) {
-                                trimmed_vec[pixel_counter][i] = (float)trimmedValues[i];
+                                trimmed_vec[pixel_counter][i] = trimmedValues[i];
                             } else {
                                 trimmed_vec[pixel_counter][i] = 0.0f;
                             }

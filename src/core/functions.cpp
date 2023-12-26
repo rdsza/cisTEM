@@ -1420,34 +1420,34 @@ bool StripEnclosingSingleQuotesFromString(wxString& string_to_strip) {
 }
 
 // Function to calculate the Winsor mean
-double calculateWinsorMean(const std::vector<double>& trimmedValues) {
-    double sum = 0.0;
-    for (double value : trimmedValues) {
+float calculateWinsorMean(const std::vector<float>& trimmedValues) {
+    float sum = 0.0;
+    for (float value : trimmedValues) {
         sum += value;
     }
     return sum / trimmedValues.size();
 }
 
 // Function to calculate the standard deviation
-double calculateStdDev(const std::vector<double>& trimmedValues, double mean) {
-    double sumSquaredDiff = 0.0;
-    for (double value : trimmedValues) {
-        double diff = value - mean;
+float calculateStdDev(const std::vector<float>& trimmedValues, float mean) {
+    float sumSquaredDiff = 0.0;
+    for (float value : trimmedValues) {
+        float diff = value - mean;
         sumSquaredDiff += diff * diff;
     }
     return std::sqrt(sumSquaredDiff / trimmedValues.size());
 }
 
 // Function to calculate the trimmed values
-std::vector<double> calculateTrimmedValues(const std::vector<double>& input, double lowerTrim, double upperTrim) {
-    std::vector<double> trimmedValues;
+std::vector<float> calculateTrimmedValues(const std::vector<float>& input, float lowerTrim, float upperTrim) {
+    std::vector<float> trimmedValues;
 
     // Calculate the lower and upper trimming bounds
-    double lowerBound = lowerTrim * (input.size() - 1);
-    double upperBound = upperTrim * (input.size() - 1);
+    float lowerBound = lowerTrim * (input.size() - 1);
+    float upperBound = upperTrim * (input.size() - 1);
 
     // Sort the input array
-    std::vector<double> sortedInput = input;
+    std::vector<float> sortedInput = input;
     std::sort(sortedInput.begin(), sortedInput.end());
 
     // Trim the values
