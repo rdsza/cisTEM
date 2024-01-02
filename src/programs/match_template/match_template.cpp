@@ -482,7 +482,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     double* correlation_pixel_sum_of_squares = new double[input_image.real_memory_allocated];
     double* medianValues                     = new double[input_image.real_memory_allocated];
     double* absolute_deviation               = new double[input_image.real_memory_allocated];
-    double* MAD                              = new double[input_image.real_memory_allocated];
+    double* MADValues                              = new double[input_image.real_memory_allocated];
     //double* winsor_mean = new double[input_image.real_memory_allocated];
     //double* winsor_std = new double[input_image.real_memory_allocated];
 
@@ -929,9 +929,9 @@ bool MatchTemplateApp::DoCalculation( ) {
                         absolute_deviation[pixel_counter] = abs(pixel_value - medianValues[pixel_counter]);
                         // Update median incrementally
                         if (current_search_position == first_search_position) {
-                            MAD[pixel_counter] = absolute_deviation[pixel_counter];
+                            MADValues[pixel_counter] = absolute_deviation[pixel_counter];
                         } else {
-                             MAD[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * MADValues[pixel_counter] + (1.0 / (frameCount + 1)) * abs_deviation[pixel_counter];
+                             MADValues[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * MADValues[pixel_counter] + (1.0 / (frameCount + 1)) * abs_deviation[pixel_counter];
                         }
                         // Check for outliers
                         if (abs_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
