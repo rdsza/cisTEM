@@ -480,6 +480,9 @@ bool MatchTemplateApp::DoCalculation( ) {
     //winsor_std_image.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     double* correlation_pixel_sum            = new double[input_image.real_memory_allocated];
     double* correlation_pixel_sum_of_squares = new double[input_image.real_memory_allocated];
+    double* medianValues                     = new double[input_image.real_memory_allocated];
+    double* absolute_deviation               = new double[input_image.real_memory_allocated];
+    double* MAD                              = new double[input_image.real_memory_allocated];
     //double* winsor_mean = new double[input_image.real_memory_allocated];
     //double* winsor_std = new double[input_image.real_memory_allocated];
 
@@ -828,6 +831,8 @@ bool MatchTemplateApp::DoCalculation( ) {
             // Set the values for the trim bounds
             //float lowerTrim = 0.1;
             //float upperTrim = 0.1;
+            int frameCount = 0;
+            float outlierThreshold = 3.0;
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
                 
@@ -912,50 +917,38 @@ bool MatchTemplateApp::DoCalculation( ) {
                         pixel_counter += padded_reference.padding_jump_value;
                     }
                     // RD MAD
-                    //for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
+                    for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
+                        // Update median incrementally
+                        double pixel_value = padded_reference.real_values[pixel_counter];
+                        if (current_search_position == first_search_position) {
+                            medianValues[pixel_counter] = pixel_value;
+                        } else {
+                            medianValues[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * medianValues[pixel_counter] + (1.0 / (frameCount + 1)) * pixel_value;
+                        }
+                        // Calculate absolute deviation from median
+                        absolute_deviation[pixel_counter] = abs(pixel_value - medianValues[pixel_counter]);
+                        // Update median incrementally
+                        if (current_search_position == first_search_position) {
+                            MAD[pixel_counter] = absolute_deviation[pixel_counter]
+                        } else {
+                             MAD[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * MADValues[pixel_counter] + (1.0 / (frameCount + 1)) * abs_deviation[pixel_counter];
+                        }
+                        // Check for outliers
+                        if (abs_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
+                            correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
+                            correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter]*padded_reference.real_values[pixel_counter];
+                        }
 
-                        // Take the column values for a given pixel and make a new vector to be passed into the winsorize function
-                        
-                        // Add the new value to the vector
-                        //float valueToAppend = padded_reference.real_values[pixel_counter];
-                        // Find the first '0.0' and replace it with the new value (if found)
-                        //bool replaced = false;
-                        //for (int j = 0; j < second_dim; ++j) {
-                        //    if (trimmed_vec[pixel_counter][j] == 0.0) {
-                        //        trimmed_vec[pixel_counter][j] = valueToAppend;
-                        //        replaced = true;
-                        //        break; // Stop after the first '0.0' is replaced
-                        //        }
-                        //        }
-                        // Initialize a vector to store the values from the row
-                        //std::vector<float> updated_Trim;
-                        //for (int j = 0; j < second_dim; ++j) {
-                        //    updated_Trim.push_back(trimmed_vec[pixel_counter][j]);
-                        //    }
-                        // Calculate trimmed Vaues
-                        //std::vector<float> trimmedValues = calculateTrimmedValues(updated_Trim, lowerTrim, upperTrim);
-                        // Calculate Winsor mean
-                        //winsor_mean[pixel_counter] = calculateWinsorMean(trimmedValues);
-                        //Calculate Standard Deviation
-                        //winsor_std[pixel_counter] = calculateStdDev(trimmedValues, winsor_mean[pixel_counter]);
-                        // Update the 2D array with Output trimmed vector
-                        //for (int j = 0; j <= second_dim ; ++j) {
-                        //    if (j < trimmedValues.size()) {
-                        //        trimmed_vec[pixel_counter][i] = trimmedValues[i];
-                        //    } else {
-                        //        trimmed_vec[pixel_counter][i] = 0.0f;
-                        //    }
-                        //    }
-                    //}
+                    }
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
-                    for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
-                        correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
-                    }
-                    padded_reference.SquareRealValues( );
+                    //for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
+                    //    correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
+                    //}
+                    //padded_reference.SquareRealValues( );
                     //                    correlation_pixel_sum_of_squares.AddImage(&padded_reference);
-                    for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
-                        correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter];
-                    }
+                    //for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
+                    //    correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter];
+                    //}
                     
 
                     //max_intensity_projection.QuickAndDirtyWriteSlice("/tmp/mip.mrc", 1);
@@ -975,8 +968,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         AddJobToResultQueue(temp_result);
                     }
                 }
-                // Delete the winsor trimmed vector here.
-                //delete[] trimmed_vec;
+                frameCount++;
             }
         }
     }
