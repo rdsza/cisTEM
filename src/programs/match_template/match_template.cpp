@@ -835,7 +835,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             //float lowerTrim = 0.1;
             //float upperTrim = 0.1;
             int frameCount = 0;
-            int outlierThreshold = 5;
+            int outlierThreshold = 3;
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
                 
@@ -937,7 +937,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                              MADValues[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * MADValues[pixel_counter] + (1.0 / (frameCount + 1)) * absolute_deviation[pixel_counter];
                         }
                         // Check for outliers
-                        if (absolute_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
+                        if (absolute_deviation[pixel_counter] > outlierThreshold * MADValues[pixel_counter]){
                             correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
                             correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter]*padded_reference.real_values[pixel_counter];
                         }
