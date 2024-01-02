@@ -926,7 +926,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         //        replaced = true;
                         //        break; // Stop after the first '0.0' is replaced
                         //        }
-                                }
+                        //        }
                         // Initialize a vector to store the values from the row
                         //std::vector<float> updated_Trim;
                         //for (int j = 0; j < second_dim; ++j) {
