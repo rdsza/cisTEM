@@ -937,7 +937,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                              MADValues[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * MADValues[pixel_counter] + (1.0 / (frameCount + 1)) * abs_deviation[pixel_counter];
                         }
                         // Check for outliers
-                        if (abs_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
+                        if (absolute_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
                             correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
                             correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter]*padded_reference.real_values[pixel_counter];
                         }
