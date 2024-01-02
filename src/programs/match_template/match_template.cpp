@@ -835,7 +835,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             //float lowerTrim = 0.1;
             //float upperTrim = 0.1;
             int frameCount = 0;
-            float outlierThreshold = 3.0;
+            int outlierThreshold = 5;
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
                 
@@ -923,7 +923,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
                         // Update median incrementally
                         double pixel_value = padded_reference.real_values[pixel_counter];
-                        if (current_search_position == first_search_position) {
+                        if (current_search_position == first_search_position) { // can use if (frameCount == 0)
                             medianValues[pixel_counter] = pixel_value;
                         } else {
                             medianValues[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * medianValues[pixel_counter] + (1.0 / (frameCount + 1)) * pixel_value;
@@ -931,7 +931,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         // Calculate absolute deviation from median
                         absolute_deviation[pixel_counter] = abs(pixel_value - medianValues[pixel_counter]);
                         // Update median incrementally
-                        if (current_search_position == first_search_position) {
+                        if (current_search_position == first_search_position) { // can use if (frameCount == 0)
                             MADValues[pixel_counter] = absolute_deviation[pixel_counter];
                         } else {
                              MADValues[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * MADValues[pixel_counter] + (1.0 / (frameCount + 1)) * absolute_deviation[pixel_counter];
