@@ -495,9 +495,9 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     ZeroDoubleArray(correlation_pixel_sum, input_image.real_memory_allocated);
     ZeroDoubleArray(correlation_pixel_sum_of_squares, input_image.real_memory_allocated);
-    ZeroDoubleArray(medianValues, input_image.real_memory_allocated)
-    ZeroDoubleArray(absolute_deviation, input_image.real_memory_allocated)
-    ZeroDoubleArray(MADValues, input_image.real_memory_allocated)
+    ZeroDoubleArray(medianValues, input_image.real_memory_allocated);
+    ZeroDoubleArray(absolute_deviation, input_image.real_memory_allocated);
+    ZeroDoubleArray(MADValues, input_image.real_memory_allocated);
 
     //ZeroDoubleArray(winsor_mean, input_image.real_memory_allocated);
     //ZeroDoubleArray(winsor_std, input_image.real_memory_allocated);
@@ -934,7 +934,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         if (current_search_position == first_search_position) {
                             MADValues[pixel_counter] = absolute_deviation[pixel_counter];
                         } else {
-                             MADValues[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * MADValues[pixel_counter] + (1.0 / (frameCount + 1)) * abs_deviation[pixel_counter];
+                             MADValues[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * MADValues[pixel_counter] + (1.0 / (frameCount + 1)) * absolute_deviation[pixel_counter];
                         }
                         // Check for outliers
                         if (absolute_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
