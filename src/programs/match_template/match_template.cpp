@@ -926,7 +926,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         if (current_search_position == first_search_position) { // can use if (frameCount == 0)
                             medianValues[pixel_counter] = pixel_value;
                         } else {
-                            medianValues[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * medianValues[pixel_counter] + (1.0 / (frameCount + 1)) * pixel_value;
+                            medianValues[pixel_counter] = (1 - 1.0 / frameCount) * medianValues[pixel_counter] + (1.0 / frameCount) * pixel_value;
                         }
                         // Calculate absolute deviation from median
                         absolute_deviation[pixel_counter] = abs(pixel_value - medianValues[pixel_counter]);
@@ -934,10 +934,10 @@ bool MatchTemplateApp::DoCalculation( ) {
                         if (current_search_position == first_search_position) { // can use if (frameCount == 0)
                             MADValues[pixel_counter] = absolute_deviation[pixel_counter];
                         } else {
-                             MADValues[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * MADValues[pixel_counter] + (1.0 / (frameCount + 1)) * absolute_deviation[pixel_counter];
+                             MADValues[pixel_counter] = (1 - 1.0 / frameCount ) * MADValues[pixel_counter] + (1.0 / frameCount) * absolute_deviation[pixel_counter];
                         }
                         // Check for outliers
-                        if (absolute_deviation[pixel_counter] > outlierThreshold * MADValues[pixel_counter]){
+                        if (absolute_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
                             correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
                             correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter]*padded_reference.real_values[pixel_counter];
                         }
