@@ -495,6 +495,9 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     ZeroDoubleArray(correlation_pixel_sum, input_image.real_memory_allocated);
     ZeroDoubleArray(correlation_pixel_sum_of_squares, input_image.real_memory_allocated);
+    ZeroDoubleArray(medianValues, input_image.real_memory_allocated)
+    ZeroDoubleArray(absolute_deviation, input_image.real_memory_allocated)
+    ZeroDoubleArray(MADValues, input_image.real_memory_allocated)
 
     //ZeroDoubleArray(winsor_mean, input_image.real_memory_allocated);
     //ZeroDoubleArray(winsor_std, input_image.real_memory_allocated);
