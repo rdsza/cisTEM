@@ -929,7 +929,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         absolute_deviation[pixel_counter] = abs(pixel_value - medianValues[pixel_counter]);
                         // Update median incrementally
                         if (current_search_position == first_search_position) {
-                            MAD[pixel_counter] = absolute_deviation[pixel_counter]
+                            MAD[pixel_counter] = absolute_deviation[pixel_counter];
                         } else {
                              MAD[pixel_counter] = (1 - 1.0 / (frameCount + 1)) * MADValues[pixel_counter] + (1.0 / (frameCount + 1)) * abs_deviation[pixel_counter];
                         }
