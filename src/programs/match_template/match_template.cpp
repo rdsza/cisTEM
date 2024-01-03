@@ -650,7 +650,6 @@ bool MatchTemplateApp::DoCalculation( ) {
     for ( current_psi = psi_start; current_psi <= psi_max; current_psi += psi_step ) {
         number_of_rotations++;
     }
-    int counter = 0;
 
     ProgressBar* my_progress;
 
@@ -837,6 +836,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             //float upperTrim = 0.1;
             int frameCount = 0;
             int outlierThreshold = 3;
+            int inner_counter = 0;
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
                 
@@ -939,7 +939,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         }
                         // Check for outliers
                         if (absolute_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
-                            counter++;
+                            inner_counter++;
                             correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
                             correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter]*padded_reference.real_values[pixel_counter];
                         }
@@ -1035,7 +1035,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         delete my_progress;
 
         // scale images..
-        wxPrintf("\n\n\tNew number of trimmed correlation positions :  %d\n", counter);
+        wxPrintf("\n\n\tNew number of trimmed correlation positions :  %d\n", inner_counter);
         for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
 
             //            correlation_pixel_sum.real_values[pixel_counter] /= float(total_correlation_positions);
@@ -1046,9 +1046,9 @@ bool MatchTemplateApp::DoCalculation( ) {
             //            }
             //            else correlation_pixel_sum_of_squares.real_values[pixel_counter] = 0.0f;
             //correlation_pixel_sum[pixel_counter] /= float(total_correlation_positions);
-            correlation_pixel_sum[pixel_counter] /=float(counter);
+            correlation_pixel_sum[pixel_counter] /=float(inner_counter);
             //correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float(total_correlation_positions) - powf(correlation_pixel_sum[pixel_counter], 2);
-            correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float (counter) - powf(correlation_pixel_sum[pixel_counter], 2);
+            correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float (inner_counter) - powf(correlation_pixel_sum[pixel_counter], 2);
             if ( correlation_pixel_sum_of_squares[pixel_counter] > 0.0f ) {
                 correlation_pixel_sum_of_squares[pixel_counter] = sqrtf(correlation_pixel_sum_of_squares[pixel_counter]) * (float)sqrt_input_pixels;
             }
