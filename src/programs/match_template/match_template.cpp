@@ -650,7 +650,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     for ( current_psi = psi_start; current_psi <= psi_max; current_psi += psi_step ) {
         number_of_rotations++;
     }
-    int corr_position = 0;
+    int counter = 0;
 
     ProgressBar* my_progress;
 
@@ -923,14 +923,14 @@ bool MatchTemplateApp::DoCalculation( ) {
                     // RD MAD
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
                         // Update median incrementally
-                        double pixel_value = padded_reference.real_values[pixel_counter];
+                        //double pixel_value = 
                         if (current_search_position == first_search_position) { // can use if (frameCount == 0)
                             medianValues[pixel_counter] = pixel_value;
                         } else {
-                            medianValues[pixel_counter] = (1 - 1.0 / frameCount) * medianValues[pixel_counter] + (1.0 / frameCount) * pixel_value;
+                            medianValues[pixel_counter] = (1 - 1.0 / frameCount) * medianValues[pixel_counter] + (1.0 / frameCount) * padded_reference.real_values[pixel_counter];
                         }
                         // Calculate absolute deviation from median
-                        absolute_deviation[pixel_counter] = abs(pixel_value - medianValues[pixel_counter]);
+                        absolute_deviation[pixel_counter] = abs(padded_reference.real_values[pixel_counter] - medianValues[pixel_counter]);
                         // Update median incrementally
                         if (current_search_position == first_search_position) { // can use if (frameCount == 0)
                             MADValues[pixel_counter] = absolute_deviation[pixel_counter];
@@ -939,7 +939,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         }
                         // Check for outliers
                         if (absolute_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
-                            corr_position++;
+                            counter++;
                             correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
                             correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter]*padded_reference.real_values[pixel_counter];
                         }
@@ -977,7 +977,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             }
         }
     }
-    wxPrintf("\n\n\tNew number of correlation positions : trimmed %d\n", corr_position);
+    
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
 
     //for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++) {
@@ -1035,7 +1035,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         delete my_progress;
 
         // scale images..
-
+        wxPrintf("\n\n\tNew number of trimmed correlation positions :  %d\n", counter);
         for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
 
             //            correlation_pixel_sum.real_values[pixel_counter] /= float(total_correlation_positions);
@@ -1046,9 +1046,9 @@ bool MatchTemplateApp::DoCalculation( ) {
             //            }
             //            else correlation_pixel_sum_of_squares.real_values[pixel_counter] = 0.0f;
             //correlation_pixel_sum[pixel_counter] /= float(total_correlation_positions);
-            correlation_pixel_sum[pixel_counter] /=float(corr_position);
+            correlation_pixel_sum[pixel_counter] /=float(counter);
             //correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float(total_correlation_positions) - powf(correlation_pixel_sum[pixel_counter], 2);
-            correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float (corr_position) - powf(correlation_pixel_sum[pixel_counter], 2);
+            correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float (counter) - powf(correlation_pixel_sum[pixel_counter], 2);
             if ( correlation_pixel_sum_of_squares[pixel_counter] > 0.0f ) {
                 correlation_pixel_sum_of_squares[pixel_counter] = sqrtf(correlation_pixel_sum_of_squares[pixel_counter]) * (float)sqrt_input_pixels;
             }
