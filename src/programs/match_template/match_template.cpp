@@ -924,7 +924,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
                         // Update median incrementally
                         //double pixel_value = 
-                        if (current_search_position == first_search_position) { // can use if (frameCount == 0)
+                        if (frameCount == 0) { // can use if (frameCount == 0)
                             medianValues[pixel_counter] = padded_reference.real_values[pixel_counter];
                         } else {
                             medianValues[pixel_counter] = (1 - 1.0 / frameCount) * medianValues[pixel_counter] + (1.0 / frameCount) * padded_reference.real_values[pixel_counter];
@@ -932,7 +932,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         // Calculate absolute deviation from median
                         absolute_deviation[pixel_counter] = abs(padded_reference.real_values[pixel_counter] - medianValues[pixel_counter]);
                         // Update median incrementally
-                        if (current_search_position == first_search_position) { // can use if (frameCount == 0)
+                        if (frameCount == 0) { // can use if (frameCount == 0)
                             MADValues[pixel_counter] = absolute_deviation[pixel_counter];
                         } else {
                              MADValues[pixel_counter] = (1 - 1.0 / frameCount ) * MADValues[pixel_counter] + (1.0 / frameCount) * absolute_deviation[pixel_counter];
