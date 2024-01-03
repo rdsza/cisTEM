@@ -650,6 +650,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     for ( current_psi = psi_start; current_psi <= psi_max; current_psi += psi_step ) {
         number_of_rotations++;
     }
+    int corr_position = 0;
 
     ProgressBar* my_progress;
 
@@ -836,7 +837,6 @@ bool MatchTemplateApp::DoCalculation( ) {
             //float upperTrim = 0.1;
             int frameCount = 0;
             int outlierThreshold = 3;
-            int corr_position = 0;
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
                 
