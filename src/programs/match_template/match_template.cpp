@@ -925,7 +925,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         // Update median incrementally
                         //double pixel_value = 
                         if (current_search_position == first_search_position) { // can use if (frameCount == 0)
-                            medianValues[pixel_counter] = pixel_value;
+                            medianValues[pixel_counter] = padded_reference.real_values[pixel_counter];
                         } else {
                             medianValues[pixel_counter] = (1 - 1.0 / frameCount) * medianValues[pixel_counter] + (1.0 / frameCount) * padded_reference.real_values[pixel_counter];
                         }
