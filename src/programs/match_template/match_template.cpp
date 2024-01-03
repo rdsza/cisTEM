@@ -684,6 +684,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     int minPos = first_search_position;
     int maxPos = last_search_position;
     int incPos = (nJobs) / (max_threads);
+    int total_corr = 0;
 
 //    wxPrintf("First last and inc %d, %d, %d\n", minPos, maxPos, incPos);
 #ifdef ENABLEGPU
@@ -836,7 +837,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             //float upperTrim = 0.1;
             int frameCount = 0;
             int outlierThreshold = 3;
-            int total_corr = 0;
+            
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
                 
