@@ -1035,7 +1035,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         delete my_progress;
 
         // scale images..
-        wxPrintf("\n\n\tNew number of trimmed correlation positions :  %d\n", inner_counter);
+        wxPrintf("\n\n\tNew number of trimmed correlation positions :  %i\n", inner_counter);
         for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
 
             //            correlation_pixel_sum.real_values[pixel_counter] /= float(total_correlation_positions);
