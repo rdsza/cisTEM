@@ -684,7 +684,6 @@ bool MatchTemplateApp::DoCalculation( ) {
     int minPos = first_search_position;
     int maxPos = last_search_position;
     int incPos = (nJobs) / (max_threads);
-    int total_corr = 0;
 
 //    wxPrintf("First last and inc %d, %d, %d\n", minPos, maxPos, incPos);
 #ifdef ENABLEGPU
@@ -837,7 +836,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             //float upperTrim = 0.1;
             int frameCount = 0;
             int outlierThreshold = 3;
-            
+            int corr_position = 0;
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
                 
@@ -940,7 +939,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         }
                         // Check for outliers
                         if (absolute_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
-                            total_corr++;
+                            corr_position++;
                             correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
                             correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter]*padded_reference.real_values[pixel_counter];
                         }
@@ -974,11 +973,11 @@ bool MatchTemplateApp::DoCalculation( ) {
                         AddJobToResultQueue(temp_result);
                     }
                 }
-                frameCount++;
+                frameCount++;                
             }
         }
     }
-
+    wxPrintf("\n\n\tNew number of correlation positions : trimmed %s\n", (corr_position).Format( ));
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
 
     //for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++) {
@@ -1047,9 +1046,9 @@ bool MatchTemplateApp::DoCalculation( ) {
             //            }
             //            else correlation_pixel_sum_of_squares.real_values[pixel_counter] = 0.0f;
             //correlation_pixel_sum[pixel_counter] /= float(total_correlation_positions);
-            correlation_pixel_sum[pixel_counter] /=float(total_corr);
+            correlation_pixel_sum[pixel_counter] /=float(corr_position);
             //correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float(total_correlation_positions) - powf(correlation_pixel_sum[pixel_counter], 2);
-            correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float (total_corr) - powf(correlation_pixel_sum[pixel_counter], 2);
+            correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float (corr_position) - powf(correlation_pixel_sum[pixel_counter], 2);
             if ( correlation_pixel_sum_of_squares[pixel_counter] > 0.0f ) {
                 correlation_pixel_sum_of_squares[pixel_counter] = sqrtf(correlation_pixel_sum_of_squares[pixel_counter]) * (float)sqrt_input_pixels;
             }
