@@ -977,7 +977,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             }
         }
     }
-    wxPrintf("\n\n\tNew number of correlation positions : trimmed %s\n", (corr_position).Format( ));
+    wxPrintf("\n\n\tNew number of correlation positions : trimmed %d\n", corr_position);
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
 
     //for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++) {
