@@ -942,7 +942,8 @@ bool MatchTemplateApp::DoCalculation( ) {
                         // Check for outliers
                         if (absolute_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
                             correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
-                            correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter]*padded_reference.real_values[pixel_counter];
+                            //padded_reference.SquareRealValues( );
+                            correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter].SquareRealValues( );
                             trimmed_counter[pixel_counter] += 1;
                         }
 
@@ -977,6 +978,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                 }
                 frameCount++;                
             }
+            wxPrintf("\n\n\tTimings: Overall: %i\n", frameCount++);
         }
     }
     
