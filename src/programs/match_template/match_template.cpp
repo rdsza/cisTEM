@@ -686,6 +686,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     int minPos = first_search_position;
     int maxPos = last_search_position;
     int incPos = (nJobs) / (max_threads);
+    int frameCount = 0;
 
 //    wxPrintf("First last and inc %d, %d, %d\n", minPos, maxPos, incPos);
 #ifdef ENABLEGPU
@@ -836,7 +837,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             // Set the values for the trim bounds
             //float lowerTrim = 0.1;
             //float upperTrim = 0.1;
-            int frameCount = 0;
+            
             int outlierThreshold = 3;
 
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
@@ -948,6 +949,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         }
 
                     }
+                    frameCount++;
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     //for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
                     //    correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
@@ -975,13 +977,12 @@ bool MatchTemplateApp::DoCalculation( ) {
                         temp_result->SetResult(1, &temp_float);
                         AddJobToResultQueue(temp_result);
                     }
-                }
-                frameCount++;                
+                }                
             }
-            wxPrintf("\n\n\tTimings: Overall: %i\n", frameCount);
         }
     }
     
+    wxPrintf("\n\n\t Frame Count: %i\n", frameCount);
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
 
     //for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++) {
