@@ -14,7 +14,7 @@
                 "__WXGTK__",
                 "DEBUG"
             ],
-            "compilerPath": "/opt/intel/oneapi/compiler/latest/linux/bin/intel64/icpc",
+            "compilerPath": "/opt/intel/oneapi/compiler/2023.2.1/linux/bin/intel64/icpc",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "browse": {
@@ -36,7 +36,7 @@
                 "ENABLEGPU",
                 "SHOW_CISTEM_GPU_OPTIONS"
             ],
-            "compilerPath": "/opt/intel/oneapi/compiler/latest/linux/bin/intel64/icpc",
+            "compilerPath": "/opt/intel/oneapi/compiler/2023.2.1/linux/bin/intel64/icpc",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "browse": {
@@ -59,7 +59,7 @@
                 "ENABLEGPU",
                 "SHOW_CISTEM_GPU_OPTIONS"
             ],
-            "compilerPath": "/opt/intel/oneapi/compiler/latest/linux/bin/intel64/icpc",
+            "compilerPath": "/opt/intel/oneapi/compiler/2023.2.1/linux/bin/intel64/icpc",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "browse": {

@@ -253,6 +253,11 @@ void TemplateMatchingCore::RunInnerLoop(Image& projection_filter, float c_pixel,
             ccc_counter++;
             total_number_of_cccs_calculated++;
 
+            // Add condition here 
+            // Need a method for GPU in GpuImage.cu : calculate median image for i=0 and median_weighted_image for i>0
+            // Same for MAD values
+            // Use the outlier threshold condition method for MAD image, and dsum and dsumSq2 will contain only pixels whose MAD values are higher than outlier threshold
+
             if ( ccc_counter % 10 == 0 ) {
                 this->AccumulateSums(my_stats, d_sum1, d_sumSq1);
             }

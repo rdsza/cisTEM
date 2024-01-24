@@ -2262,6 +2262,17 @@ void GpuImage::Mean( ) {
     this->img_mean = float(npp_mean);
 }
 
+void GpuImage::WeightedMedian( ){
+    MyDebugAssertTrue(is_in_memory_gpu, "Memory not allocated");
+    MyDebugAssertTrue(is_in_real_space, "Not in reall space");
+}
+
+void GpuImage::WeightedMedAbsDev( ){
+    MyDebugAssertTrue(is_in_memory_gpu, "Memory not allocated");
+    MyDebugAssertTrue(is_in_real_space, "Not in reall space");
+
+}
+
 void GpuImage::MeanStdDev( ) {
     MyDebugAssertTrue(is_in_memory_gpu, "Memory not allocated");
     MyDebugAssertTrue(is_in_real_space, "Not in real space");
