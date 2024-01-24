@@ -838,7 +838,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             //float lowerTrim = 0.1;
             //float upperTrim = 0.1;
             
-            int outlierThreshold = 3;
+            int outlierThreshold = 6;
 
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
