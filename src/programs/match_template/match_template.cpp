@@ -838,7 +838,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             //float lowerTrim = 0.1;
             //float upperTrim = 0.1;
             
-            int outlierThreshold = 6;
+            int outlierThreshold = 2.6;
 
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
@@ -989,6 +989,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     //    winsor_mean_image.real_values[pixel_counter] = (float)winsor_mean[pixel_counter];
     //    winsor_std_image.real_values[pixel_counter] = (float)winsor_std[pixel_counter];
     //}
+    int err_fac= 1+10.5794/100;
 
     for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
         correlation_pixel_sum_image.real_values[pixel_counter]            = (float)correlation_pixel_sum[pixel_counter];
@@ -1055,7 +1056,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             //correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float(total_correlation_positions) - powf(correlation_pixel_sum[pixel_counter], 2);
             correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float (trimmed_counter[pixel_counter]) - powf(correlation_pixel_sum[pixel_counter], 2);
             if ( correlation_pixel_sum_of_squares[pixel_counter] > 0.0f ) {
-                correlation_pixel_sum_of_squares[pixel_counter] = sqrtf(correlation_pixel_sum_of_squares[pixel_counter]) * (float)sqrt_input_pixels;
+                correlation_pixel_sum_of_squares[pixel_counter] = sqrtf(correlation_pixel_sum_of_squares[pixel_counter]) * (float)sqrt_input_pixels * float(err_fac);
             }
             else
                 correlation_pixel_sum_of_squares[pixel_counter] = 0.0f;
