@@ -982,7 +982,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     wxPrintf("\n\n\t Frame Count: %i\n", frameCount);
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
 
-    //int err_fac= 1+0.6247/100;
+    float err_fac= 1+(0.6247/100);
 
     for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
         correlation_pixel_sum_image.real_values[pixel_counter]            = (float)correlation_pixel_sum[pixel_counter];
@@ -1108,7 +1108,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
             max_intensity_projection.real_values[pixel_counter] -= correlation_pixel_sum[pixel_counter];
             if ( correlation_pixel_sum_of_squares[pixel_counter] > 0.0f ) {
-                max_intensity_projection.real_values[pixel_counter] /= correlation_pixel_sum_of_squares[pixel_counter] ;//* float(err_fac);
+                max_intensity_projection.real_values[pixel_counter] /= (correlation_pixel_sum_of_squares[pixel_counter] * err_fac);
             }
             else
                 max_intensity_projection.real_values[pixel_counter] = 0.0f;
