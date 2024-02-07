@@ -278,7 +278,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     }
 
     wxString output_pixel_filename = "pixel_values.txt";
-    long* pixel_temp;
+    double* pixel_temp;
 
     ParameterMap parameter_map; // needed for euler search init
     //for (int i = 0; i < 5; i++) {parameter_map[i] = true;}
@@ -629,7 +629,7 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     //    wxPrintf("Searching %i - %i of %i total positions\n", first_search_position, last_search_position, global_euler_search.number_of_search_positions);
     //    wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
-    pixel_temp =  new long[total_correlation_positions];
+    pixel_temp =  new double[total_correlation_positions];
     actual_number_of_ccs_calculated = 0.0;
 
     wxDateTime overall_start;
