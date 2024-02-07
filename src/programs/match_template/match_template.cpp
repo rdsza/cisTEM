@@ -105,6 +105,8 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     float    in_plane_angular_step     = 0;
     bool     use_gpu_input             = false;
     int      max_threads               = 1; // Only used for the GPU code
+    int      pixel_index_row           = 0;
+    int      pixel_index_col           = 0;
 
     UserInput* my_input = new UserInput("MatchTemplate", 1.00);
 
@@ -145,6 +147,8 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
 #endif
+    pixel_index_row            = my_input->GetIntFromUser("Provide the row index for writing output", "0", 0)
+    pixel_index_col            = my_input->GetIntFromUser("Provide the column index for writing output", "0", 0)
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -198,7 +202,9 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads);
+                                      max_threads,
+                                      pixel_index_row,
+                                      pixel_index_col);
 }
 
 // override the do calculation method which will be what is actually run..
@@ -256,6 +262,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     float    min_peak_radius                 = my_current_job.arguments[39].ReturnFloatArgument( );
     bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
+    int      pixel_index_row                 = my_current_job.arguments[42].ReturnIntegerArgument( );
+    int      pixel_index_col                 = my_current_job.arguments[43].ReturnIntegerArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -269,6 +277,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         max_threads = 1;
     }
 
+    wxString output_pixel_filename = "pixel_values.txt"
     ParameterMap parameter_map; // needed for euler search init
     //for (int i = 0; i < 5; i++) {parameter_map[i] = true;}
     parameter_map.SetAllTrue( );
@@ -639,6 +648,10 @@ bool MatchTemplateApp::DoCalculation( ) {
     int maxPos = last_search_position;
     int incPos = (nJobs) / (max_threads);
 
+    // Write out pixel values in the next loop into a text file?
+    wxPrintf("Opening textfile to write pixel values...\n\n");
+    NumericTextFile pixel_file(output_pixel_filename, OPEN_TO_WRITE, 4);
+
 //    wxPrintf("First last and inc %d, %d, %d\n", minPos, maxPos, incPos);
 #ifdef ENABLEGPU
     TemplateMatchingCore* GPU;
@@ -864,10 +877,14 @@ bool MatchTemplateApp::DoCalculation( ) {
 
                         pixel_counter += padded_reference.padding_jump_value;
                     }
+                    // Convert row,col index into pixel_counter
+                    //TODO : take into account padding
+
+                    pixel_file.WriteCommentLine( padded_reference.real_values[pixel_counter]);
 
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
-                        correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
+                        correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];    
                     }
                     padded_reference.SquareRealValues( );
                     //                    correlation_pixel_sum_of_squares.AddImage(&padded_reference);
@@ -896,7 +913,10 @@ bool MatchTemplateApp::DoCalculation( ) {
         }
     }
 
+    pixel_file.Close( );
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
+    wxPrintf("\n");
+    wxPrintf("Real space memory allocated: %d\n", input_image.real_memory_allocated)
 
     for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
         correlation_pixel_sum_image.real_values[pixel_counter]            = (float)correlation_pixel_sum[pixel_counter];
