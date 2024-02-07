@@ -278,6 +278,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     }
 
     wxString output_pixel_filename = "pixel_values.txt";
+    long* pixel_temp;
+
     ParameterMap parameter_map; // needed for euler search init
     //for (int i = 0; i < 5; i++) {parameter_map[i] = true;}
     parameter_map.SetAllTrue( );
@@ -627,7 +629,7 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     //    wxPrintf("Searching %i - %i of %i total positions\n", first_search_position, last_search_position, global_euler_search.number_of_search_positions);
     //    wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
-
+    pixel_temp =  new long[total_correlation_positions];
     actual_number_of_ccs_calculated = 0.0;
 
     wxDateTime overall_start;
@@ -880,7 +882,8 @@ bool MatchTemplateApp::DoCalculation( ) {
                     // Convert row,col index into pixel_counter
                     //TODO : take into account padding
 
-                    pixel_file.WriteLine( padded_reference.real_values[pixel_index_row+pixel_index_col]);
+                    pixel_temp[current_search_position]=padded_reference.real_values[pixel_index_row+pixel_index_col];
+                    // The above is not going to work. NEed to save these values into a double array & then pass to WRiteLine function.
 
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
@@ -912,7 +915,7 @@ bool MatchTemplateApp::DoCalculation( ) {
             }
         }
     }
-
+    pixel_file.WriteLine(pixel_temp);
     pixel_file.Close( );
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
     wxPrintf("\n");
