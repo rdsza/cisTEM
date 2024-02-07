@@ -147,8 +147,8 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
 #endif
-    pixel_index_row            = my_input->GetIntFromUser("Provide the row index for writing output", "0", 0)
-    pixel_index_col            = my_input->GetIntFromUser("Provide the column index for writing output", "0", 0)
+    pixel_index_row            = my_input->GetIntFromUser("Provide the row index for writing output", "0", 0);
+    pixel_index_col            = my_input->GetIntFromUser("Provide the column index for writing output", "0", 0);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -277,7 +277,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         max_threads = 1;
     }
 
-    wxString output_pixel_filename = "pixel_values.txt"
+    wxString output_pixel_filename = "pixel_values.txt";
     ParameterMap parameter_map; // needed for euler search init
     //for (int i = 0; i < 5; i++) {parameter_map[i] = true;}
     parameter_map.SetAllTrue( );
@@ -880,7 +880,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                     // Convert row,col index into pixel_counter
                     //TODO : take into account padding
 
-                    pixel_file.WriteCommentLine( padded_reference.real_values[pixel_counter]);
+                    pixel_file.WriteCommentLine( padded_reference.real_values[pixel_index_row+pixel_index_col]);
 
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
@@ -916,7 +916,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     pixel_file.Close( );
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
     wxPrintf("\n");
-    wxPrintf("Real space memory allocated: %d\n", input_image.real_memory_allocated)
+    wxPrintf("Real space memory allocated: %d\n", input_image.real_memory_allocated);
 
     for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
         correlation_pixel_sum_image.real_values[pixel_counter]            = (float)correlation_pixel_sum[pixel_counter];
