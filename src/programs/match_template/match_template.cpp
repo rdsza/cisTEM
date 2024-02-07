@@ -880,7 +880,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                     // Convert row,col index into pixel_counter
                     //TODO : take into account padding
 
-                    pixel_file.WriteCommentLine( padded_reference.real_values[pixel_index_row+pixel_index_col]);
+                    pixel_file.WriteLine( padded_reference.real_values[pixel_index_row+pixel_index_col]);
 
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
