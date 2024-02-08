@@ -884,7 +884,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                     // Convert row,col index into pixel_counter
                     //TODO : take into account padding
 
-                    pixel_temp[current_search_position]=padded_reference.real_values[pixel_index_row+pixel_index_col];
+                    pixel_temp[current_search_position]=padded_reference.real_values[5743];
                     // The above is not going to work. NEed to save these values into a double array & then pass to WRiteLine function.
 
                     //                    correlation_pixel_sum.AddImage(&padded_reference);
