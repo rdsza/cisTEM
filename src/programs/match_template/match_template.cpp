@@ -143,8 +143,8 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     //    ctf_refinement = my_input->GetYesNoFromUser("Refine defocus", "Should the particle defocus be refined?", "No");
     particle_radius_angstroms = my_input->GetFloatFromUser("Mask radius for global search (A) (0.0 = max)", "Radius of a circular mask to be applied to the input images during global search", "0.0", 0.0);
     my_symmetry               = my_input->GetSymmetryFromUser("Template symmetry", "The symmetry of the template reconstruction", "C1");
-    pixel_index_row            = my_input->GetIntFromUser("Provide the row index for writing output", "0", 0);
-    pixel_index_col            = my_input->GetIntFromUser("Provide the column index for writing output", "0", 0);
+    pixel_index_row            = my_input->GetIntFromUser("Provide the row index for writing output", "This will be added to col", "0", 0);
+    pixel_index_col            = my_input->GetIntFromUser("Provide the column index for writing output", "This will be added to row", "0", 0);
 #ifdef ENABLEGPU
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
