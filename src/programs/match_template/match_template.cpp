@@ -261,10 +261,11 @@ bool MatchTemplateApp::DoCalculation( ) {
     wxString directory_for_results           = my_current_job.arguments[37].ReturnStringArgument( );
     wxString result_output_filename          = my_current_job.arguments[38].ReturnStringArgument( );
     float    min_peak_radius                 = my_current_job.arguments[39].ReturnFloatArgument( );
-    bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
-    int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
-    int      pixel_index_row                 = my_current_job.arguments[42].ReturnIntegerArgument( );
-    int      pixel_index_col                 = my_current_job.arguments[43].ReturnIntegerArgument( );
+    int      pixel_index_row                 = my_current_job.arguments[40].ReturnIntegerArgument( );
+    int      pixel_index_col                 = my_current_job.arguments[41].ReturnIntegerArgument( );
+    bool     use_gpu                         = my_current_job.arguments[42].ReturnBoolArgument( );
+    int      max_threads                     = my_current_job.arguments[43].ReturnIntegerArgument( );
+
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
