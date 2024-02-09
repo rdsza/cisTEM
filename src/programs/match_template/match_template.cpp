@@ -105,8 +105,6 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     float    in_plane_angular_step     = 0;
     bool     use_gpu_input             = false;
     int      max_threads               = 1; // Only used for the GPU code
-    int      pixel_index_row           = 0;
-    int      pixel_index_col           = 0;
 
     UserInput* my_input = new UserInput("MatchTemplate", 1.00);
 
@@ -143,8 +141,6 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     //    ctf_refinement = my_input->GetYesNoFromUser("Refine defocus", "Should the particle defocus be refined?", "No");
     particle_radius_angstroms = my_input->GetFloatFromUser("Mask radius for global search (A) (0.0 = max)", "Radius of a circular mask to be applied to the input images during global search", "0.0", 0.0);
     my_symmetry               = my_input->GetSymmetryFromUser("Template symmetry", "The symmetry of the template reconstruction", "C1");
-    pixel_index_row            = my_input->GetIntFromUser("Provide the row index for writing output", "This will be added to col", "0", 0);
-    pixel_index_col            = my_input->GetIntFromUser("Provide the column index for writing output", "This will be added to row", "0", 0);
 #ifdef ENABLEGPU
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
@@ -162,7 +158,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 
     delete my_input;
 
-    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfiibi", input_search_images.ToUTF8( ).data( ),
+    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbi", input_search_images.ToUTF8( ).data( ),
                                       input_reconstruction.ToUTF8( ).data( ),
                                       pixel_size,
                                       voltage_kV,
@@ -202,8 +198,6 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       directory_for_results.ToUTF8( ).data( ),
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
-                                      pixel_index_row,
-                                      pixel_index_col,
                                       use_gpu_input,
                                       max_threads);
 }
@@ -261,8 +255,6 @@ bool MatchTemplateApp::DoCalculation( ) {
     wxString directory_for_results           = my_current_job.arguments[37].ReturnStringArgument( );
     wxString result_output_filename          = my_current_job.arguments[38].ReturnStringArgument( );
     float    min_peak_radius                 = my_current_job.arguments[39].ReturnFloatArgument( );
-    int      pixel_index_row                 = my_current_job.arguments[40].ReturnIntegerArgument( );
-    int      pixel_index_col                 = my_current_job.arguments[41].ReturnIntegerArgument( );
     bool     use_gpu                         = my_current_job.arguments[42].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[43].ReturnIntegerArgument( );
 
