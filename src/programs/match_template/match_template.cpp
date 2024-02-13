@@ -271,7 +271,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         max_threads = 1;
     }
 
-    wxString output_pixel_filename = "pixel_values.txt";
+    wxString output_pixel_filename = "/home/rdsouza/pixel_values.txt";
     double* pixel_temp;
 
     ParameterMap parameter_map; // needed for euler search init
