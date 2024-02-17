@@ -930,7 +930,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                             medianValues[pixel_counter] = (1 - 1.0 / frameCount) * medianValues[pixel_counter] + (1.0 / frameCount) * padded_reference.real_values[pixel_counter];
                         }
                         // Calculate absolute deviation from median
-                        absolute_deviation[pixel_counter] = abs(abs(padded_reference.real_values[pixel_counter]) - medianValues[pixel_counter]);
+                        absolute_deviation[pixel_counter] = abs(padded_reference.real_values[pixel_counter] - medianValues[pixel_counter]);
                         // Update median incrementally
                         if (frameCount == 0) { // can use if (frameCount == 0)
                             MADValues[pixel_counter] = absolute_deviation[pixel_counter];
@@ -941,7 +941,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                         if (absolute_deviation[pixel_counter] < outlierThreshold * MADValues[pixel_counter]){
                             correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
                             //padded_reference.SquareRealValues( );
-                            correlation_pixel_sum_of_squares[pixel_counter] *= padded_reference.real_values[pixel_counter]
+                            correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter]*padded_reference.real_values[pixel_counter];
                             trimmed_counter[pixel_counter] += 1;
                         }
 
