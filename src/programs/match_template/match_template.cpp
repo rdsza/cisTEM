@@ -1057,7 +1057,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                     padded_reference.BackwardFFT( );
                     
                     //RD
-                    padded_reference.QuickAndDirtyWriteSlice(wxString::Format("%i_psi_%f_cc.mrc",current_search_position,current_psi).ToStdString(), 1);
+                    //padded_reference.QuickAndDirtyWriteSlice(wxString::Format("%i_psi_%f_cc.mrc",current_search_position,current_psi).ToStdString(), 1);
                     //Test
                     //padded_reference.QuickAndDirtyWriteSlice("cc.mrc", current_search_position).ToStdString(), 1);
                     //.QuickAndDirtyWriteSlice("cc.mrc", 1);
