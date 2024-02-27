@@ -148,9 +148,6 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     use_gpu_input = my_input->GetYesNoFromUser("Use GPU", "Offload expensive calcs to GPU", "No");
     max_threads   = my_input->GetIntFromUser("Max. threads to use for calculation", "when threading, what is the max threads to run", "1", 1);
 #endif
-    //winsor_avg_output_file      = my_input->GetFilenameFromUser("Correlation winsor average value file ", "The file for saving the winsor average of all the correlation images", "corr_winsor_avg.mrc", false);
-    //winsor_std_output_file      = my_input->GetFilenameFromUser("Correlation winsor std deviation value file ", "The file for saving the winsor std deviation of all the correlation images", "corr_winsor_std.mrc", false);
-    healpix_file = my_input->GetFilenameFromUser("Healpix region segment file", "File containing the Phi and Theta values for search","orientations.txt", false);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -163,7 +160,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 
     delete my_input;
 
-    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbit", input_search_images.ToUTF8( ).data( ),
+    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbi", input_search_images.ToUTF8( ).data( ),
                                       input_reconstruction.ToUTF8( ).data( ),
                                       pixel_size,
                                       voltage_kV,
@@ -204,10 +201,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads,
-                                      //winsor_avg_output_file.ToUTF8( ).data(),
-                                      //winsor_std_output_file.ToUTF8( ).data(),
-                                      healpix_file.ToUTF8( ).data( ));
+                                      max_threads);
 }
 
 // override the do calculation method which will be what is actually run..
@@ -265,9 +259,6 @@ bool MatchTemplateApp::DoCalculation( ) {
     float    min_peak_radius                 = my_current_job.arguments[39].ReturnFloatArgument( );
     bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
-    //wxString winsor_avg_output_file          = my_current_job.arguments[42].ReturnStringArgument( );
-    //wxString winsor_std_output_file          = my_current_job.arguments[43].ReturnStringArgument( );
-    wxString healpix_file                    = my_current_job.arguments[42].ReturnStringArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -557,7 +548,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     // search grid
 
     global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
-    /* if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
+    if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
     {
         if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
         {
@@ -565,21 +556,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         }
     }
 
-    global_euler_search.CalculateGridSearchPositions(false); */
-
-    float orientations[healpix_binning.number_of_lines];
-    number_of_search_positions = healpix_binning.number_of_lines;
-    global_euler_search.number_of_search_positions = number_of_search_positions;
-    Allocate2DFloatArray(global_euler_search.list_of_search_parameters, number_of_search_positions, 2);
-
-    // for loop here
-    for (int counter = 0; counter < healpix_binning.number_of_lines; counter ++){
-        healpix_binning.ReadLine(orientations);
-        global_euler_search.list_of_search_parameters[counter][0]=orientations[0];
-        global_euler_search.list_of_search_parameters[counter][1]=orientations[1];
-    }
-
-    healpix_binning.Close();
+    global_euler_search.CalculateGridSearchPositions(false);
 
     // for now, I am assuming the MTF has been applied already.
     // work out the filter to just whiten the image..
