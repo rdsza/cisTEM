@@ -79,10 +79,8 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     wxString output_histogram_file;
     wxString correlation_std_output_file;
     wxString correlation_avg_output_file;
-    //wxString winsor_avg_output_file;
-    //wxString winsor_std_output_file;
+
     wxString scaled_mip_output_file;
-    wxString healpix_file;
 
     float pixel_size              = 1.0f;
     float voltage_kV              = 300.0f;
@@ -328,8 +326,6 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     EulerSearch     global_euler_search;
     AnglesAndShifts angles;
-
-    NumericTextFile healpix_binning(healpix_file, OPEN_TO_READ, 0);
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
