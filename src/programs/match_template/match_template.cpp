@@ -473,6 +473,11 @@ bool MatchTemplateApp::DoCalculation( ) {
     correlation_pixel_sum_of_squares_image.Allocate(input_image.logical_x_dimension, input_image.logical_y_dimension, 1);
     double* correlation_pixel_sum            = new double[input_image.real_memory_allocated];
     double* correlation_pixel_sum_of_squares = new double[input_image.real_memory_allocated];
+    //RD: Images objects for the online statistics
+    double* medianValues                     = new double[input_image.real_memory_allocated];
+    double* absolute_deviation               = new double[input_image.real_memory_allocated];
+    double* MADValues                        = new double[input_image.real_memory_allocated];
+    double* trimmed_counter                  = new double[input_image.real_memory_allocated];
 
     padded_reference.SetToConstant(0.0f);
     max_intensity_projection.SetToConstant(-FLT_MAX);
@@ -483,6 +488,11 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     ZeroDoubleArray(correlation_pixel_sum, input_image.real_memory_allocated);
     ZeroDoubleArray(correlation_pixel_sum_of_squares, input_image.real_memory_allocated);
+    //RD: Assign the images 
+    ZeroDoubleArray(medianValues, input_image.real_memory_allocated);
+    ZeroDoubleArray(absolute_deviation, input_image.real_memory_allocated);
+    ZeroDoubleArray(MADValues, input_image.real_memory_allocated);
+    ZeroDoubleArray(trimmed_counter, input_image.real_memory_allocated);
 
     sqrt_input_pixels = sqrt((double)(input_image.logical_x_dimension * input_image.logical_y_dimension));
 
