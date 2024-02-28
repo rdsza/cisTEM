@@ -575,7 +575,7 @@ bool MatchTemplateApp::DoCalculation( ) {
         global_euler_search.list_of_search_parameters[counter][1]=orientations[1];
     }
 
-    healpix_binning.Close()
+    healpix_binning.Close();
     
     // for now, I am assuming the MTF has been applied already.
     // work out the filter to just whiten the image..
