@@ -332,6 +332,9 @@ bool MatchTemplateApp::DoCalculation( ) {
     int    remove_npix_from_edge = 0;
     double sqrt_input_pixels;
 
+    //RD: for counting the lines in the file and assigning the Float array global_euler_search.list_of_search_parameters
+    int number_of_search_positions = 0;
+
     EulerSearch     global_euler_search;
     AnglesAndShifts angles;
 
