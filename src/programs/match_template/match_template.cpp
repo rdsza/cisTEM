@@ -80,6 +80,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     wxString correlation_std_output_file;
     wxString correlation_avg_output_file;
     wxString scaled_mip_output_file;
+    wxString healpix_file;
 
     float pixel_size              = 1.0f;
     float voltage_kV              = 300.0f;
@@ -152,6 +153,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
     use_gpu_input = false;
     max_threads   = 1;
 #endif
+    healpix_file = my_input->GetFilenameFromUser("Healpix region segment file", "File containing the Phi and Theta values for search","orientations.txt", false);
 
     int   first_search_position           = -1;
     int   last_search_position            = -1;
@@ -164,7 +166,7 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
 
     delete my_input;
 
-    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbi", input_search_images.ToUTF8( ).data( ),
+    my_current_job.ManualSetArguments("ttffffffffffifffffbfftttttttttftiiiitttfbit", input_search_images.ToUTF8( ).data( ),
                                       input_reconstruction.ToUTF8( ).data( ),
                                       pixel_size,
                                       voltage_kV,
@@ -205,7 +207,8 @@ void MatchTemplateApp::DoInteractiveUserInput( ) {
                                       result_filename.ToUTF8( ).data( ),
                                       min_peak_radius,
                                       use_gpu_input,
-                                      max_threads);
+                                      max_threads,
+                                      healpix_file.ToUTF8( ).data( ));
 }
 
 // override the do calculation method which will be what is actually run..
@@ -263,6 +266,7 @@ bool MatchTemplateApp::DoCalculation( ) {
     float    min_peak_radius                 = my_current_job.arguments[39].ReturnFloatArgument( );
     bool     use_gpu                         = my_current_job.arguments[40].ReturnBoolArgument( );
     int      max_threads                     = my_current_job.arguments[41].ReturnIntegerArgument( );
+    wxString healpix_file                    = my_current_job.arguments[42].ReturnStringArgument( );
 
     if ( is_running_locally == false )
         max_threads = number_of_threads_requested_on_command_line; // OVERRIDE FOR THE GUI, AS IT HAS TO BE SET ON THE COMMAND LINE...
@@ -330,6 +334,9 @@ bool MatchTemplateApp::DoCalculation( ) {
 
     EulerSearch     global_euler_search;
     AnglesAndShifts angles;
+
+    //RD : To open the text file containing the orientations from Healpix
+    NumericTextFile healpix_binning(healpix_file, OPEN_TO_READ, 0);
 
     ImageFile input_search_image_file;
     ImageFile input_reconstruction_file;
@@ -531,9 +538,9 @@ bool MatchTemplateApp::DoCalculation( ) {
     //wxPrintf("psi_start = %f, psi_max = %f, psi_step = %f\n", psi_start, psi_max, psi_step);
 
     // search grid
-
+    //RD : Rewriting the global_euler_search.list_of_search_paramters from the healpix text file
     global_euler_search.InitGrid(my_symmetry, angular_step, 0.0f, 0.0f, psi_max, psi_step, psi_start, pixel_size / high_resolution_limit_search, parameter_map, best_parameters_to_keep);
-    if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
+    /*if ( my_symmetry.StartsWith("C") ) // TODO 2x check me - w/o this O symm at least is broken
     {
         if ( global_euler_search.test_mirror == true ) // otherwise the theta max is set to 90.0 and test_mirror is set to true.  However, I don't want to have to test the mirrors.
         {
@@ -541,8 +548,22 @@ bool MatchTemplateApp::DoCalculation( ) {
         }
     }
 
-    global_euler_search.CalculateGridSearchPositions(false);
+    global_euler_search.CalculateGridSearchPositions(false);*/
+  
+    float orientations[healpix_binning.number_of_lines];
+    number_of_search_positions = healpix_binning.number_of_lines;
+    global_euler_search.number_of_search_positions = number_of_search_positions;
+    Allocate2DFloatArray(global_euler_search.list_of_search_parameters, number_of_search_positions, 2);
 
+    // for loop here
+    for (int counter = 0; counter < healpix_binning.number_of_lines; counter ++){
+        healpix_binning.ReadLine(orientations);
+        global_euler_search.list_of_search_parameters[counter][0]=orientations[0];
+        global_euler_search.list_of_search_parameters[counter][1]=orientations[1];
+    }
+
+    healpix_binning.Close()
+    
     // for now, I am assuming the MTF has been applied already.
     // work out the filter to just whiten the image..
 
@@ -645,6 +666,8 @@ bool MatchTemplateApp::DoCalculation( ) {
     int minPos = first_search_position;
     int maxPos = last_search_position;
     int incPos = (nJobs) / (max_threads);
+    //RD: counter to keep in check the values that are added into the sum_of_squares and sum_image
+    int frameCount = 0;
 
 //    wxPrintf("First last and inc %d, %d, %d\n", minPos, maxPos, incPos);
 #ifdef ENABLEGPU
@@ -788,6 +811,9 @@ bool MatchTemplateApp::DoCalculation( ) {
 #endif
             }
 
+            //RD: The multiple used for the outlier removal condition : current abs deviation <= thresholdMultiplier*median abs deviation
+            int thresholdMultiplier = 3.0;
+
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
 
@@ -873,7 +899,35 @@ bool MatchTemplateApp::DoCalculation( ) {
                         pixel_counter += padded_reference.padding_jump_value;
                     }
 
-                    //                    correlation_pixel_sum.AddImage(&padded_reference);
+                    //RD: Removed the block where pixel_sum and pixel_sum_of_squares are updated. Added my block between that.
+                    for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ){
+                        // Update median incrementally
+                        //double pixel_value = 
+                        if (frameCount == 0) { // can use if (frameCount == 0)
+                            medianValues[pixel_counter] = padded_reference.real_values[pixel_counter];
+                        } else {
+                            medianValues[pixel_counter] = (1 - 1.0 / frameCount) * medianValues[pixel_counter] + (1.0 / frameCount) * padded_reference.real_values[pixel_counter];
+                        }
+                        // Calculate absolute deviation from median
+                        absolute_deviation[pixel_counter] = abs(padded_reference.real_values[pixel_counter] - medianValues[pixel_counter]);
+                        // Update median incrementally
+                        if (frameCount == 0) { // can use if (frameCount == 0)
+                            MADValues[pixel_counter] = absolute_deviation[pixel_counter];
+                        } else {
+                             MADValues[pixel_counter] = (1 - 1.0 / frameCount ) * MADValues[pixel_counter] + (1.0 / frameCount) * absolute_deviation[pixel_counter];
+                        }
+                        // Check for outliers
+                        if (absolute_deviation[pixel_counter] <= thresholdMultiplier * MADValues[pixel_counter]){
+                            correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
+                            //padded_reference.SquareRealValues( );
+                            correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter]*padded_reference.real_values[pixel_counter];
+                            trimmed_counter[pixel_counter] += 1;
+                        }
+
+                    }
+                    frameCount++;
+                  
+                    /*//                    correlation_pixel_sum.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
                         correlation_pixel_sum[pixel_counter] += padded_reference.real_values[pixel_counter];
                     }
@@ -881,7 +935,7 @@ bool MatchTemplateApp::DoCalculation( ) {
                     //                    correlation_pixel_sum_of_squares.AddImage(&padded_reference);
                     for ( pixel_counter = 0; pixel_counter < padded_reference.real_memory_allocated; pixel_counter++ ) {
                         correlation_pixel_sum_of_squares[pixel_counter] += padded_reference.real_values[pixel_counter];
-                    }
+                    }*/
 
                     //max_intensity_projection.QuickAndDirtyWriteSlice("/tmp/mip.mrc", 1);
 
@@ -905,6 +959,9 @@ bool MatchTemplateApp::DoCalculation( ) {
     }
 
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
+
+    //RD : error factor to be included with the standard deviation to make up for the error associated with trimming 
+    float err_fac = 1+(6.1605/100);
 
     for ( pixel_counter = 0; pixel_counter < input_image.real_memory_allocated; pixel_counter++ ) {
         correlation_pixel_sum_image.real_values[pixel_counter]            = (float)correlation_pixel_sum[pixel_counter];
@@ -961,10 +1018,14 @@ bool MatchTemplateApp::DoCalculation( ) {
             //                correlation_pixel_sum_of_squares.real_values[pixel_counter] = sqrtf(correlation_pixel_sum_of_squares.real_values[pixel_counter]) * sqrtf(correlation_pixel_sum.logical_x_dimension * correlation_pixel_sum.logical_y_dimension);
             //            }
             //            else correlation_pixel_sum_of_squares.real_values[pixel_counter] = 0.0f;
-            correlation_pixel_sum[pixel_counter] /= float(total_correlation_positions);
-            correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float(total_correlation_positions) - powf(correlation_pixel_sum[pixel_counter], 2);
+            //RD : divide by the right number of correlation positions based on the "if" condition; different values are included for different pixels
+            //correlation_pixel_sum[pixel_counter] /= float(total_correlation_positions);
+            correlation_pixel_sum[pixel_counter] /=float(trimmed_counter[pixel_counter]);
+            //correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float(total_correlation_positions) - powf(correlation_pixel_sum[pixel_counter], 2);
+            correlation_pixel_sum_of_squares[pixel_counter] = correlation_pixel_sum_of_squares[pixel_counter] / float (trimmed_counter[pixel_counter]) - powf(correlation_pixel_sum[pixel_counter], 2);
             if ( correlation_pixel_sum_of_squares[pixel_counter] > 0.0f ) {
-                correlation_pixel_sum_of_squares[pixel_counter] = sqrtf(correlation_pixel_sum_of_squares[pixel_counter]) * (float)sqrt_input_pixels;
+                //RD : do the error correction here
+                correlation_pixel_sum_of_squares[pixel_counter] = sqrtf(correlation_pixel_sum_of_squares[pixel_counter]) * (float)sqrt_input_pixels * err_fac;
             }
             else
                 correlation_pixel_sum_of_squares[pixel_counter] = 0.0f;
