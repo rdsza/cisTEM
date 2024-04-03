@@ -857,11 +857,15 @@ bool MatchTemplateApp::DoCalculation( ) {
             //RD: The multiple used for the outlier removal condition : current abs deviation <= thresholdMultiplier*median abs deviation
             // BAH: FIXME: why is a double being used to assign to an int.
             // BAH: FIXME: this value is also being used in TemplateMatchingCore, so you must change it there as well
-            int thresholdMultiplier = 3.0;
+            double thresholdMultiplier = 3.0;
 #endif
             for ( current_search_position = first_search_position; current_search_position <= last_search_position; current_search_position++ ) {
                 //loop over each rotation angle
-
+#ifdef MEDIAN_FILTER_TEST
+                //RD: To write out the cross correlation values into a stack of mrc files
+                MRCFile out_cc_stack(wxString::Format("search_position_%i_cc.mrc", current_search_position+1).ToStdString(), true);
+                int psi_counter = 0;
+#endif
                 //current_rotation = 0;
                 for ( current_psi = psi_start; current_psi <= psi_max; current_psi += psi_step ) {
 
@@ -910,6 +914,10 @@ bool MatchTemplateApp::DoCalculation( ) {
                     // Note: the cross correlation will have variance 1/N (the product of variance of the two FFTs assuming the means are both zero and the distributions independent.)
                     // Taking the inverse FFT scales this variance by N resulting in a MIP with variance 1
                     padded_reference.BackwardFFT( );
+
+#ifdef MEDIAN_FILTER_TEST
+                    padded_reference.WriteSlice(&out_cc_stack, psi_counter);
+#endif
 
                     // update mip, and histogram..
                     pixel_counter = 0;
@@ -1010,9 +1018,18 @@ bool MatchTemplateApp::DoCalculation( ) {
                         AddJobToResultQueue(temp_result);
                     }
                 }
+#ifdef MEDIAN_FILTER_TEST
+                out_cc_stack.SetPixelSize(pixel_size);
+                out_cc_stack.WriteHeader( );
+                wxPrintf("The output cross correlation stack for position %i is written. ", current_search_position)
             }
         }
     }
+#else
+            }
+        }
+    }
+#endif
 
     wxPrintf("\n\n\tTimings: Overall: %s\n", (wxDateTime::Now( ) - overall_start).Format( ));
 #ifdef MEDIAN_FILTER_TEST
